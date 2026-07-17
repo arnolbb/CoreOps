@@ -1,0 +1,214 @@
+# Task Board
+
+This file is the lightweight repository task board. It may later be replaced by GitHub Projects, Linear, or another tracker.
+
+## Status Values
+
+- `BACKLOG`
+- `READY`
+- `IN_PROGRESS`
+- `BLOCKED`
+- `REVIEW`
+- `DONE`
+
+## Priority Values
+
+- `P0` Critical
+- `P1` High
+- `P2` Normal
+- `P3` Low
+
+## Task Format
+
+```text
+ID:
+Title:
+Status:
+Priority:
+Owner:
+Depends on:
+Specification:
+Acceptance criteria:
+Tests:
+Notes:
+```
+
+---
+
+## EPIC FOUNDATION
+
+### TASK-FND-001
+
+- **Title:** Initialize Next.js TypeScript project
+- **Status:** DONE
+- **Priority:** P1
+- **Depends on:** None
+- **Specification:** `docs/05-system-architecture.md`
+- **Acceptance criteria:**
+  - Next.js App Router initialized
+  - TypeScript strict mode enabled
+  - Linting and formatting configured
+  - Base directory structure created
+  - Production build succeeds
+- **Tests:** Build and smoke test
+
+### TASK-FND-002
+
+- **Title:** Configure local Supabase development
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-FND-001
+- **Specification:** `docs/06-database-design.md`
+- **Acceptance criteria:**
+  - Local project configuration exists
+  - Migration folder exists
+  - Seed workflow documented
+  - Local reset is reproducible
+
+### TASK-FND-003
+
+- **Title:** Configure CI checks
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-FND-001
+- **Specification:** `docs/14-ci-cd.md`
+
+---
+
+## EPIC AUTHENTICATION AND ORGANIZATIONS
+
+### TASK-ORG-001
+
+- **Title:** Create organization and membership schema
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-FND-002
+- **Specification:** `docs/02-product-requirements.md`, `docs/06-database-design.md`
+- **Acceptance criteria:**
+  - Organizations table exists
+  - Organization memberships table exists
+  - Owner membership is created atomically
+  - RLS policies isolate organizations
+  - Cross-tenant tests pass
+
+### TASK-ORG-002
+
+- **Title:** Build create-organization onboarding
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-ORG-001
+
+### TASK-ORG-003
+
+- **Title:** Implement member invitations
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-ORG-001
+
+---
+
+## EPIC CUSTOMERS
+
+### TASK-CUS-001
+
+- **Title:** Create customer schema and RLS
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-ORG-001
+
+### TASK-CUS-002
+
+- **Title:** Implement customer list and search
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-CUS-001
+
+### TASK-CUS-003
+
+- **Title:** Implement customer create and edit
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-CUS-001
+
+---
+
+## EPIC PRODUCTS AND INVENTORY
+
+### TASK-PRO-001
+
+- **Title:** Create product and category schema
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-ORG-001
+
+### TASK-INV-001
+
+- **Title:** Create warehouse and inventory ledger schema
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-PRO-001
+
+### TASK-INV-002
+
+- **Title:** Implement stock adjustment transaction
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-INV-001
+
+---
+
+## EPIC SALES
+
+### TASK-SAL-001
+
+- **Title:** Create sales order schema
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-CUS-001, TASK-PRO-001
+
+### TASK-SAL-002
+
+- **Title:** Implement transactional sales order creation
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-SAL-001, TASK-INV-001
+
+---
+
+## EPIC WORK ORDERS
+
+### TASK-WOR-001
+
+- **Title:** Create work order schema
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-CUS-001
+
+### TASK-WOR-002
+
+- **Title:** Implement work order lifecycle
+- **Status:** BACKLOG
+- **Priority:** P1
+- **Depends on:** TASK-WOR-001
+
+---
+
+## EPIC PRODUCTION READINESS
+
+### TASK-PRD-001
+
+- **Title:** Add observability and error tracking
+- **Status:** BACKLOG
+- **Priority:** P1
+
+### TASK-PRD-002
+
+- **Title:** Verify backup and restore procedure
+- **Status:** BACKLOG
+- **Priority:** P0
+
+### TASK-PRD-003
+
+- **Title:** Complete production readiness review
+- **Status:** BACKLOG
+- **Priority:** P0
