@@ -74,7 +74,7 @@ Rejected. Establishing the migration and seed workflow now (with a minimal non-b
 
 - Developers run `npm run supabase:start` once, then `npm run supabase:reset` to rebuild schema deterministically.
 - Local endpoints: API `http://127.0.0.1:54321`, Postgres `127.0.0.1:54322`, Studio `http://127.0.0.1:54323`.
-- CI integration of the local stack is deferred to TASK-FND-003.
+- CI starts this same local stack, resets it twice, verifies local migration history, and stops it unconditionally per ADR-0003 and TASK-FND-003.
 
 ## Review Date
 

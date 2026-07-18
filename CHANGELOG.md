@@ -29,6 +29,9 @@ The format follows these sections:
 - npm scripts: `supabase:start`, `supabase:stop`, `supabase:status`, `supabase:reset`, `supabase:migration:new`, `supabase:db:push`, `supabase:types`.
 - README section documenting start, stop, reset, migration, and seed commands.
 - ADR-0002 recording the local Supabase development decision.
+- GitHub Actions CI for pull requests and pushes to `main`, using Node.js 24, reproducible npm installs, code-quality gates, production build validation, and local Supabase migration checks.
+- Two-reset local database validation with an explicit check for migration `20260718210437` and unconditional non-blocking Supabase cleanup.
+- ADR-0003 recording CI security, caching, local Supabase, and dependency-audit handling decisions.
 
 ### Changed
 

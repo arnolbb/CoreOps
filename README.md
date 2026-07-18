@@ -122,6 +122,39 @@ workflow is reproducible.
 - Do not commit `.env.local` or any keys printed by `supabase status`.
 - Do not put real or production-like data in `seed.sql`.
 
+## Continuous Integration
+
+GitHub Actions runs `.github/workflows/ci.yml` for pull requests and pushes to `main`. The job uses Node.js 24 and `npm ci`, then checks formatting, linting, types, the production build, and local migration reproducibility.
+
+Database validation starts the Docker-backed local Supabase stack, resets the database twice, prints `supabase migration list --local`, and fails unless migration `20260718210437` appears. Cleanup runs even after a failed step. CI does not use production secrets, a Supabase access token, or a linked remote project.
+
+Run equivalent checks locally:
+
+```bash
+npm ci
+npm run format:check
+npm run lint
+npm run typecheck
+npm run build
+npm run supabase:start
+npm run supabase:reset
+npm run supabase:reset
+npx supabase migration list --local
+npm run supabase:stop
+```
+
+Confirm the migration-list output contains `20260718210437`. Always stop the local stack after validation, including when a prior command fails.
+
+### CI troubleshooting
+
+- **Docker daemon unavailable:** Start Docker Desktop and confirm `docker info` succeeds before running Supabase commands.
+- **Supabase startup timeout or port conflict:** Stop another CoreOps stack with `npm run supabase:stop`, check ports `54320`-`54324` and `54327`, then retry.
+- **Migration missing:** Confirm `supabase/migrations/20260718210437_foundation_setup.sql` exists, then run both resets again and inspect `npx supabase migration list --local`.
+- **`npm ci` lockfile error:** Update dependencies through a reviewed `npm install`, commit the resulting `package-lock.json`, and rerun `npm ci`. Do not edit the lockfile manually.
+- **Cleanup warning after another failure:** Treat the earlier failed step as the primary failure. Cleanup is non-blocking so a stop error cannot hide it; manually run `npm run supabase:stop` if needed.
+
+Dependency advisories require review and deliberate upgrades. CI does not run automated audit remediation. Never run `npm audit fix` or `npm audit fix --force` as part of this workflow.
+
 ## Documentation Map
 
 Start with:

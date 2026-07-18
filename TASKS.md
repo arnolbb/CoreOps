@@ -69,10 +69,19 @@ Notes:
 ### TASK-FND-003
 
 - **Title:** Configure CI checks
-- **Status:** BACKLOG
+- **Status:** REVIEW
 - **Priority:** P1
-- **Depends on:** TASK-FND-001
+- **Depends on:** TASK-FND-001, TASK-FND-002
 - **Specification:** `docs/14-ci-cd.md`
+- **Acceptance criteria:**
+  - GitHub Actions runs on pull requests and pushes to `main`
+  - Node.js 24 and `npm ci` provide reproducible dependency installation
+  - Formatting, linting, typechecking, and production build pass
+  - Local Supabase starts without remote credentials or project linkage
+  - Two consecutive database resets succeed
+  - Local migration history contains `20260718210437`
+  - Supabase cleanup runs after success or failure without hiding the primary result
+- **Notes:** Implementation and local validation complete on Node `24.18.0`: `npm ci`, formatting, linting, typechecking, production build, local Supabase startup, two consecutive resets, migration-list verification for `20260718210437`, and cleanup passed. Hosted validation remains pending; mark `DONE` only after a committed, pushed GitHub Actions run is green. CI and dependency-audit decisions are recorded in ADR-0003.
 
 ---
 
