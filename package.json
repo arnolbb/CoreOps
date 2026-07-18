@@ -16,7 +16,8 @@
     "supabase:reset": "supabase db reset",
     "supabase:migration:new": "supabase migration new",
     "supabase:db:push": "supabase db push",
-    "supabase:types": "supabase gen types typescript --local --schema public > src/types/database-generated.ts"
+    "supabase:types": "supabase gen types typescript --local --schema public > src/types/database-generated.ts",
+    "db:test": "node scripts/run-db-tests.mjs"
   },
   "dependencies": {
     "next": "16.2.10",

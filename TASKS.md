@@ -90,7 +90,7 @@ Notes:
 ### TASK-ORG-001
 
 - **Title:** Create organization and membership schema
-- **Status:** BACKLOG
+- **Status:** REVIEW
 - **Priority:** P1
 - **Depends on:** TASK-FND-002
 - **Specification:** `docs/02-product-requirements.md`, `docs/06-database-design.md`
@@ -100,6 +100,8 @@ Notes:
   - Owner membership is created atomically
   - RLS policies isolate organizations
   - Cross-tenant tests pass
+- **Tests:** `npm run db:test`
+- **Notes:** Migration `20260718230000_create_organizations_and_memberships.sql` adds organizations, memberships, tenant-isolation RLS policies, atomic organization creation, and last-Owner protection. Keep in `REVIEW` until branch is pushed and hosted GitHub Actions passes.
 
 ### TASK-ORG-002
 

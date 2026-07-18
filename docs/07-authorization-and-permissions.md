@@ -100,7 +100,7 @@ Authenticated user
 | Financial reports     |   Yes |         Yes |                 No |                  No | Optional |
 | Audit logs            |   Yes |    Optional |                 No |                  No |       No |
 
-Exact defaults must be implemented as seed data and tested.
+Exact defaults must be implemented as seed data and tested when the dedicated RBAC tables are introduced. TASK-ORG-001 only constrains membership role codes and records the RBAC deferral in ADR-0004.
 
 ## Ownership Rules
 

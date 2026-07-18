@@ -23,6 +23,8 @@ Use `templates/adr-template.md`.
 | -------- | ----------------------------------------- | -------- |
 | ADR-0001 | Initial technology stack and version pins | Accepted |
 | ADR-0002 | Local Supabase development setup          | Accepted |
+| ADR-0003 | CI checks and dependency audit handling   | Accepted |
+| ADR-0004 | Organization and membership schema        | Accepted |
 
 ## Accepted Decision: Modular Monolith
 

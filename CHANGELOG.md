@@ -32,10 +32,13 @@ The format follows these sections:
 - GitHub Actions CI for pull requests and pushes to `main`, using Node.js 24, reproducible npm installs, code-quality gates, production build validation, and local Supabase migration checks.
 - Two-reset local database validation with an explicit check for migration `20260718210437` and unconditional non-blocking Supabase cleanup.
 - ADR-0003 recording CI security, caching, local Supabase, and dependency-audit handling decisions.
+- Organization and membership schema with UUID primary keys, timestamps, constraints, lookup indexes, active-membership RLS, atomic organization creation, and last-Owner protection.
+- Deterministic database test runner and TASK-ORG-001 tenant-isolation SQL tests.
+- ADR-0004 recording the minimal organization membership schema and deferral of full RBAC tables.
 
 ### Changed
 
-- None.
+- CI now runs deterministic database tests after local Supabase resets.
 
 ### Fixed
 
@@ -44,3 +47,4 @@ The format follows these sections:
 ### Security
 
 - Defined mandatory multi-tenant isolation and authorization standards.
+- Added RLS policies proving active membership access, non-member denial, disabled membership denial, cross-tenant read denial, cross-tenant write denial, duplicate membership rejection, and last-Owner protection.

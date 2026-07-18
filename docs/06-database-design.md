@@ -48,7 +48,7 @@ updated_at timestamptz
 id uuid PK
 organization_id uuid FK
 user_id uuid FK
-role_id uuid FK
+role text
 status text
 joined_at timestamptz
 created_at timestamptz
@@ -57,7 +57,10 @@ updated_at timestamptz
 unique (organization_id, user_id)
 index (user_id, status)
 index (organization_id, status)
+index (organization_id) where role = 'owner' and status = 'active'
 ```
+
+TASK-ORG-001 stores default role codes directly as constrained text to keep the first tenant boundary minimal. Full role and permission tables are deferred per ADR-0004.
 
 ### roles
 

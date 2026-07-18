@@ -72,6 +72,7 @@ npm run supabase:start   # start local Supabase stack (API, DB, Auth, Studio, ..
 npm run supabase:status  # show running services and local connection details
 npm run supabase:stop    # stop the stack (keeps data)
 npm run supabase:reset   # reset DB from migrations + seed (destroys local data)
+npm run db:test          # run deterministic database and tenant-isolation tests
 ```
 
 After `supabase:start`, copy the printed local keys into `.env.local` (never committed):
@@ -101,8 +102,9 @@ npm run supabase:db:push
 ```
 
 The initial migration `20260718210437_foundation_setup.sql` enables the `pgcrypto` and `citext` extensions
-and a shared `set_updated_at()` trigger helper. No business tables exist yet — they arrive in
-later feature tasks (`TASK-ORG-001`, `TASK-CUS-001`, `TASK-PRO-001`, ...).
+and a shared `set_updated_at()` trigger helper. Migration `20260718230000_create_organizations_and_memberships.sql`
+adds the first tenant boundary: organizations, organization memberships, active-membership RLS policies,
+atomic organization creation, and last-Owner protection.
 
 ### Seed
 
@@ -126,7 +128,7 @@ workflow is reproducible.
 
 GitHub Actions runs `.github/workflows/ci.yml` for pull requests and pushes to `main`. The job uses Node.js 24 and `npm ci`, then checks formatting, linting, types, the production build, and local migration reproducibility.
 
-Database validation starts the Docker-backed local Supabase stack, resets the database twice, prints `supabase migration list --local`, and fails unless migration `20260718210437` appears. Cleanup runs even after a failed step. CI does not use production secrets, a Supabase access token, or a linked remote project.
+Database validation starts the Docker-backed local Supabase stack, resets the database twice, runs deterministic database tests, prints `supabase migration list --local`, and fails unless migrations `20260718210437` and `20260718230000` appear. Cleanup runs even after a failed step. CI does not use production secrets, a Supabase access token, or a linked remote project.
 
 Run equivalent checks locally:
 
@@ -139,11 +141,12 @@ npm run build
 npm run supabase:start
 npm run supabase:reset
 npm run supabase:reset
+npm run db:test
 npx supabase migration list --local
 npm run supabase:stop
 ```
 
-Confirm the migration-list output contains `20260718210437`. Always stop the local stack after validation, including when a prior command fails.
+Confirm the migration-list output contains `20260718210437` and `20260718230000`. Always stop the local stack after validation, including when a prior command fails.
 
 ### CI troubleshooting
 
