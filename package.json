@@ -9,7 +9,14 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset",
+    "supabase:migration:new": "supabase migration new",
+    "supabase:db:push": "supabase db push",
+    "supabase:types": "supabase gen types typescript --local --schema public > src/types/database-generated.ts"
   },
   "dependencies": {
     "next": "16.2.10",
@@ -24,7 +31,13 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.2.10",
     "prettier": "3.6.2",
+    "supabase": "2.34.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "supabase@2.34.0": true,
+    "unrs-resolver@1.12.2": true
   }
 }

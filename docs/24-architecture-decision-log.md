@@ -22,6 +22,7 @@ Use `templates/adr-template.md`.
 | ADR      | Title                                     | Status   |
 | -------- | ----------------------------------------- | -------- |
 | ADR-0001 | Initial technology stack and version pins | Accepted |
+| ADR-0002 | Local Supabase development setup          | Accepted |
 
 ## Accepted Decision: Modular Monolith
 

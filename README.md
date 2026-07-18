@@ -60,6 +60,68 @@ npm start        # run the production build
 
 Environment variables are documented in `.env.example`. Never commit `.env` files.
 
+## Local Supabase
+
+The project uses Supabase (PostgreSQL, Auth, Storage) per `docs/05-system-architecture.md`.
+Local development runs Supabase in Docker via the Supabase CLI (`supabase`, pinned as a devDependency).
+
+Prerequisites: [Docker](https://docs.docker.com/get-docker/) running.
+
+```bash
+npm run supabase:start   # start local Supabase stack (API, DB, Auth, Studio, ...)
+npm run supabase:status  # show running services and local connection details
+npm run supabase:stop    # stop the stack (keeps data)
+npm run supabase:reset   # reset DB from migrations + seed (destroys local data)
+```
+
+After `supabase:start`, copy the printed local keys into `.env.local` (never committed):
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key from `supabase status`>
+SUPABASE_SERVICE_ROLE_KEY=<service role key from `supabase status`>  # server-only, never expose to client
+```
+
+Studio (local admin UI): http://127.0.0.1:54323
+Local Postgres: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
+
+### Migrations
+
+Migrations live in `supabase/migrations/` and are applied in filename order.
+Create a new migration:
+
+```bash
+npm run supabase:migration:new -- <name>   # e.g. npm run supabase:migration:new -- create_organizations
+```
+
+Apply pending migrations to a running stack without resetting data:
+
+```bash
+npm run supabase:db:push
+```
+
+The initial migration `20260718210437_foundation_setup.sql` enables the `pgcrypto` and `citext` extensions
+and a shared `set_updated_at()` trigger helper. No business tables exist yet — they arrive in
+later feature tasks (`TASK-ORG-001`, `TASK-CUS-001`, `TASK-PRO-001`, ...).
+
+### Seed
+
+`supabase/seed.sql` runs automatically after migrations on every `supabase db reset`.
+It is deterministic and development-only (clearly fake data per `docs/23-demo-and-seed-data.md`).
+It currently performs no inserts because no business tables exist yet.
+
+### Reset reproducibility
+
+`npm run supabase:reset` drops and recreates the local `public` schema, replays all migrations,
+then runs `seed.sql`. It is safe to run repeatedly. Run it more than once to confirm the
+workflow is reproducible.
+
+### Do not
+
+- Do not connect to or modify any production Supabase project from local commands.
+- Do not commit `.env.local` or any keys printed by `supabase status`.
+- Do not put real or production-like data in `seed.sql`.
+
 ## Documentation Map
 
 Start with:

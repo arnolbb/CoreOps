@@ -55,15 +55,16 @@ Notes:
 ### TASK-FND-002
 
 - **Title:** Configure local Supabase development
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-FND-001
-- **Specification:** `docs/06-database-design.md`
+- **Specification:** `docs/06-database-design.md`, `docs/23-demo-and-seed-data.md`
 - **Acceptance criteria:**
   - Local project configuration exists
   - Migration folder exists
   - Seed workflow documented
   - Local reset is reproducible
+- **Notes:** Supabase CLI pinned at `2.34.0`; local project, migration, seed, and npm workflows documented in `README.md` and ADR-0002. Migration `20260718210437_foundation_setup.sql` enables `pgcrypto`/`citext` and creates `public.set_updated_at()`; no business tables. Validation on Node `24.18.0` and Docker `29.6.1`: two consecutive resets each applied the foundation migration and executed `supabase/seed.sql`; local migration history matched, PostgreSQL objects were verified directly, and `format:check`, `lint`, `typecheck`, and `build` passed.
 
 ### TASK-FND-003
 
