@@ -35,10 +35,15 @@ The format follows these sections:
 - Organization and membership schema with UUID primary keys, timestamps, constraints, lookup indexes, active-membership RLS, atomic organization creation, and last-Owner protection.
 - Deterministic database test runner and TASK-ORG-001 tenant-isolation SQL tests.
 - ADR-0004 recording the minimal organization membership schema and deferral of full RBAC tables.
+- Supabase SSR authentication foundation with register, sign-in, sign-out, password reset, protected dashboard placeholder, cookie-backed sessions, and safe auth errors.
+- Next.js 16 Proxy session refresh and early auth redirects via `src/proxy.ts`.
+- Vitest unit/integration test setup and Playwright live authentication flow against local Supabase Auth and Mailpit/Inbucket.
+- ADR-0005 recording Supabase SSR auth, `getClaims()` identity checks, and deferred production rate limiting/CAPTCHA.
 
 ### Changed
 
 - CI now runs deterministic database tests after local Supabase resets.
+- CI now enforces unit tests, integration tests, production build, and the live authentication Playwright flow.
 
 ### Fixed
 

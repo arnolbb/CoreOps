@@ -39,8 +39,11 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Build
-        run: npm run build
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run integration tests
+        run: npm run test:integration
 
       - name: Start local Supabase
         run: npm run supabase:start
@@ -52,6 +55,15 @@ jobs:
 
       - name: Run database tests
         run: npm run db:test
+
+      - name: Build
+        run: node scripts/run-with-local-supabase-env.mjs npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run live authentication flow
+        run: npm run test:e2e
 
       - name: Verify local migration history
         shell: bash

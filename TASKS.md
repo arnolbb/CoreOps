@@ -87,6 +87,29 @@ Notes:
 
 ## EPIC AUTHENTICATION AND ORGANIZATIONS
 
+### TASK-AUTH-001
+
+- **Title:** Configure Supabase authentication and server session access
+- **Status:** REVIEW
+- **Priority:** P1
+- **Depends on:** TASK-FND-001, TASK-FND-002
+- **Specification:** `docs/02-product-requirements.md`, `docs/05-system-architecture.md`, `docs/07-authorization-and-permissions.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`, `docs/adr/0005-supabase-ssr-authentication.md`
+- **Acceptance criteria:**
+  - Required Supabase Next.js client dependencies are installed
+  - Browser and server Supabase clients are configured
+  - Secure cookie-based sessions are supported
+  - Registration, sign-in, sign-out, and password reset foundations exist
+  - Authenticated-user and server-session helpers exist
+  - Authenticated routes are protected
+  - Unauthenticated users are redirected safely
+  - Authentication inputs are validated
+  - Authentication errors are mapped to safe user-facing messages
+  - Organization onboarding is not implemented
+  - Invitations are not implemented
+  - Customer, product, sales, inventory, and work-order features are not implemented
+- **Tests:** `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:integration`, two `npm run supabase:reset` runs, `npm run db:test`, `node scripts/run-with-local-supabase-env.mjs npm run build`, and `npm run test:e2e` passed locally.
+- **Notes:** Implementation uses Supabase SSR PKCE email links with `exchangeCodeForSession()`, `src/proxy.ts` for Next.js 16 Proxy behavior, and `getClaims()` for trusted server-side identity checks. TASK-AUTH-001 remains in REVIEW until the branch is pushed and hosted GitHub Actions is green. Production rate limiting and CAPTCHA are deferred follow-up security work; no service-role key is used by this task.
+
 ### TASK-ORG-001
 
 - **Title:** Create organization and membership schema
@@ -108,7 +131,7 @@ Notes:
 - **Title:** Build create-organization onboarding
 - **Status:** BACKLOG
 - **Priority:** P1
-- **Depends on:** TASK-ORG-001
+- **Depends on:** TASK-ORG-001, TASK-AUTH-001
 
 ### TASK-ORG-003
 

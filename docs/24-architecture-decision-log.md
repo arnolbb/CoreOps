@@ -25,6 +25,7 @@ Use `templates/adr-template.md`.
 | ADR-0002 | Local Supabase development setup          | Accepted |
 | ADR-0003 | CI checks and dependency audit handling   | Accepted |
 | ADR-0004 | Organization and membership schema        | Accepted |
+| ADR-0005 | Supabase SSR authentication foundation    | Accepted |
 
 ## Accepted Decision: Modular Monolith
 
