@@ -5,8 +5,6 @@ const mailpitUrl = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 type MailpitMessageSummary = {
   ID?: string;
   id?: string;
-  Subject?: string;
-  subject?: string;
   To?: Array<{ Address?: string; address?: string }>;
   to?: Array<{ Address?: string; address?: string }>;
 };
@@ -39,7 +37,7 @@ function messageContainsRecipient(
 }
 
 async function getMessages() {
-  const response = await fetch(`${mailpitUrl}/api/v1/messages?limit=50`);
+  const response = await fetch(`${mailpitUrl}/api/v1/messages?limit=100`);
 
   if (!response.ok) {
     throw new Error(`Mailpit messages request failed: ${response.status}`);
@@ -60,10 +58,7 @@ async function getMessageDetail(id: string) {
   return (await response.json()) as MailpitMessageDetail;
 }
 
-function extractVerificationLink(
-  detail: MailpitMessageDetail,
-  type: "signup" | "recovery",
-) {
+function extractVerificationLink(detail: MailpitMessageDetail) {
   const content =
     `${detail.HTML ?? detail.html ?? ""}\n${detail.Text ?? detail.text ?? ""}`.replaceAll(
       "&amp;",
@@ -73,18 +68,18 @@ function extractVerificationLink(
     content.match(
       /https?:\/\/127\.0\.0\.1:54321\/auth\/v1\/verify[^\s"'<>]+/g,
     ) ?? [];
-  const matchingLink = links.find((link) => link.includes(`type=${type}`));
+  const matchingLink = links.find((link) => link.includes("type=signup"));
 
   if (!matchingLink) {
     throw new Error(
-      `No Supabase ${type} verification link found in local email.`,
+      "No Supabase signup verification link found in local email.",
     );
   }
 
   return matchingLink;
 }
 
-async function waitForEmailLink(email: string, type: "signup" | "recovery") {
+async function waitForSignupLink(email: string) {
   const deadline = Date.now() + 30_000;
   let lastError: Error | null = null;
 
@@ -104,7 +99,7 @@ async function waitForEmailLink(email: string, type: "signup" | "recovery") {
       const detail = await getMessageDetail(id);
 
       try {
-        return extractVerificationLink(detail, type);
+        return extractVerificationLink(detail);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
       }
@@ -114,88 +109,90 @@ async function waitForEmailLink(email: string, type: "signup" | "recovery") {
   }
 
   throw (
-    lastError ?? new Error(`Timed out waiting for ${type} email to ${email}.`)
+    lastError ?? new Error(`Timed out waiting for signup email to ${email}.`)
   );
 }
 
-async function signInWithoutOrganization(
-  page: Page,
-  email: string,
-  password: string,
-) {
-  await page.goto("/sign-in");
+async function registerAndConfirm(page: Page, email: string, password: string) {
+  await page.goto("/register");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/onboarding\/organization$/);
-  await expect(
-    page.getByRole("heading", { name: "Create your organization" }),
-  ).toBeVisible();
-}
-
-test("registration, confirmation, sign-in, sign-out, password recovery, and invalid sessions", async ({
-  page,
-  context,
-}) => {
-  const uniqueId = Date.now();
-  const email = `auth-${uniqueId}@example.test`;
-  const firstPassword = "password123";
-  const secondPassword = "newpassword123";
-
-  await page.goto("/");
-  await page.getByRole("link", { name: "Register" }).click();
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(firstPassword);
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(
     page.getByText("Check your email to confirm your account."),
   ).toBeVisible();
 
-  const confirmationLink = await waitForEmailLink(email, "signup");
+  const confirmationLink = await waitForSignupLink(email);
   await page.goto(confirmationLink);
   await expect(page).toHaveURL(/\/onboarding\/organization$/);
+}
+
+async function signIn(page: Page, email: string, password: string) {
+  await page.goto("/sign-in");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password);
+  await page.getByRole("button", { name: "Sign in" }).click();
+}
+
+async function createOrganization(
+  page: Page,
+  name: string,
+  slug: string,
+  currency = "USD",
+) {
+  await page.getByLabel("Organization name").fill(name);
+  await page.getByLabel("Organization address").fill(slug);
+  await page.getByLabel("Business type").selectOption("general");
+  await page.getByLabel("Timezone").selectOption("UTC");
+  await page.getByLabel("Currency").selectOption(currency);
+  await page.getByRole("button", { name: "Create organization" }).click();
+}
+
+test("new authenticated user creates organization and skips onboarding later", async ({
+  page,
+}) => {
+  const uniqueId = Date.now();
+  const email = `org-${uniqueId}@example.test`;
+  const password = "password123";
+  const slug = `org-${uniqueId}`;
+
+  await registerAndConfirm(page, email, password);
   await expect(
     page.getByRole("heading", { name: "Create your organization" }),
   ).toBeVisible();
 
+  await createOrganization(page, "Acme Operations", slug, "USD");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByText("Organization setup is complete.")).toBeVisible();
+
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
 
-  await page.goto("/dashboard");
-  await expect(page).toHaveURL(/\/sign-in\?next=%2Fdashboard$/);
+  await signIn(page, email, password);
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 
-  await signInWithoutOrganization(page, email, firstPassword);
+  await page.goto("/onboarding/organization");
+  await expect(page).toHaveURL(/\/dashboard$/);
+});
 
-  await context.clearCookies();
-  await page.goto("/dashboard");
-  await expect(page).toHaveURL(/\/sign-in\?next=%2Fdashboard$/);
+test("duplicate organization slug returns safe error", async ({ page }) => {
+  const uniqueId = Date.now();
+  const firstEmail = `org-owner-a-${uniqueId}@example.test`;
+  const secondEmail = `org-owner-b-${uniqueId}@example.test`;
+  const password = "password123";
+  const slug = `duplicate-${uniqueId}`;
 
-  await page.goto("/forgot-password");
-  await page.getByLabel("Email").fill(email);
-  await page.getByRole("button", { name: "Send reset instructions" }).click();
+  await registerAndConfirm(page, firstEmail, password);
+  await createOrganization(page, "First Organization", slug, "USD");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+
+  await registerAndConfirm(page, secondEmail, password);
+  await createOrganization(page, "Second Organization", slug, "USD");
   await expect(
-    page.getByText(
-      "If an account exists, we sent password reset instructions.",
-    ),
+    page.getByText("This organization address is unavailable."),
   ).toBeVisible();
-
-  const recoveryLink = await waitForEmailLink(email, "recovery");
-  await page.goto(recoveryLink);
-  await expect(page).toHaveURL(/\/update-password$/);
-  await page.getByLabel("New password").fill(secondPassword);
-  await page.getByRole("button", { name: "Update password" }).click();
-  await expect(page).toHaveURL(/\/sign-in\?message=password-updated$/);
-  await expect(
-    page.getByText("Password updated. Sign in with your new password."),
-  ).toBeVisible();
-
-  await signInWithoutOrganization(page, email, secondPassword);
-
-  await page.goto("/auth/callback?flow=recovery&next=%2Fupdate-password");
-  await expect(page).toHaveURL(
-    /\/forgot-password\?error=recovery-link-invalid$/,
-  );
-  await expect(
-    page.getByText("Reset link expired or invalid. Request a new one."),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/onboarding\/organization$/);
 });

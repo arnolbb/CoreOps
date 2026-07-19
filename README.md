@@ -131,7 +131,7 @@ workflow is reproducible.
 
 GitHub Actions runs `.github/workflows/ci.yml` for pull requests and pushes to `main`. The job uses Node.js 24 and `npm ci`, then checks formatting, linting, types, the production build, and local migration reproducibility.
 
-Database validation starts the Docker-backed local Supabase stack, resets the database twice, runs deterministic database tests, prints `supabase migration list --local`, and fails unless migrations `20260718210437` and `20260718230000` appear. Authentication validation also runs Vitest unit tests, Vitest integration tests, and a live Playwright flow against local Supabase Auth and local Mailpit/Inbucket. Cleanup runs even after a failed step. CI does not use production secrets, a Supabase access token, a Supabase service-role key, or a linked remote project.
+Database validation starts the Docker-backed local Supabase stack, resets the database twice, runs deterministic database tests, prints `supabase migration list --local`, and fails unless migrations `20260718210437` and `20260718230000` appear. Authentication and onboarding validation also runs Vitest unit tests, Vitest integration tests, and live Playwright flows against local Supabase Auth, local Mailpit/Inbucket, and the atomic organization creation RPC. Cleanup runs even after a failed step. CI does not use production secrets, a Supabase access token, a Supabase service-role key, or a linked remote project.
 
 Run equivalent checks locally:
 

@@ -39,11 +39,12 @@ The format follows these sections:
 - Next.js 16 Proxy session refresh and early auth redirects via `src/proxy.ts`.
 - Vitest unit/integration test setup and Playwright live authentication flow against local Supabase Auth and Mailpit/Inbucket.
 - ADR-0005 recording Supabase SSR auth, `getClaims()` identity checks, and deferred production rate limiting/CAPTCHA.
+- Organization onboarding for authenticated users without active membership, backed by the atomic `create_organization` RPC and safe duplicate-slug handling.
 
 ### Changed
 
 - CI now runs deterministic database tests after local Supabase resets.
-- CI now enforces unit tests, integration tests, production build, and the live authentication Playwright flow.
+- CI now enforces unit tests, integration tests, production build, and the live authentication and organization onboarding Playwright flows.
 
 ### Fixed
 
