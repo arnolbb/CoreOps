@@ -49,10 +49,13 @@ Exact dependency versions must be selected during implementation and recorded in
 Prerequisites: Node.js LTS (see `.nvmrc`), npm.
 
 ```bash
-npm install      # install dependencies
-npm run dev     # start the dev server at http://localhost:3000
+npm install       # install dependencies
+npm run dev      # start the dev server at http://localhost:3000
 npm run lint     # run ESLint
 npm run typecheck # run the TypeScript compiler
+npm run test:unit # run Vitest unit tests
+npm run test:integration # run Vitest integration tests
+npm run test:e2e # run live Playwright auth tests against local Supabase
 npm run format   # format with Prettier
 npm run build    # production build
 npm start        # run the production build
@@ -128,7 +131,7 @@ workflow is reproducible.
 
 GitHub Actions runs `.github/workflows/ci.yml` for pull requests and pushes to `main`. The job uses Node.js 24 and `npm ci`, then checks formatting, linting, types, the production build, and local migration reproducibility.
 
-Database validation starts the Docker-backed local Supabase stack, resets the database twice, runs deterministic database tests, prints `supabase migration list --local`, and fails unless migrations `20260718210437` and `20260718230000` appear. Cleanup runs even after a failed step. CI does not use production secrets, a Supabase access token, or a linked remote project.
+Database validation starts the Docker-backed local Supabase stack, resets the database twice, runs deterministic database tests, prints `supabase migration list --local`, and fails unless migrations `20260718210437` and `20260718230000` appear. Authentication validation also runs Vitest unit tests, Vitest integration tests, and a live Playwright flow against local Supabase Auth and local Mailpit/Inbucket. Cleanup runs even after a failed step. CI does not use production secrets, a Supabase access token, a Supabase service-role key, or a linked remote project.
 
 Run equivalent checks locally:
 
@@ -137,11 +140,14 @@ npm ci
 npm run format:check
 npm run lint
 npm run typecheck
-npm run build
+npm run test:unit
+npm run test:integration
 npm run supabase:start
 npm run supabase:reset
 npm run supabase:reset
 npm run db:test
+node scripts/run-with-local-supabase-env.mjs npm run build
+npm run test:e2e
 npx supabase migration list --local
 npm run supabase:stop
 ```
