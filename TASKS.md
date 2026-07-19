@@ -90,7 +90,7 @@ Notes:
 ### TASK-AUTH-001
 
 - **Title:** Configure Supabase authentication and server session access
-- **Status:** REVIEW
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-FND-001, TASK-FND-002
 - **Specification:** `docs/02-product-requirements.md`, `docs/05-system-architecture.md`, `docs/07-authorization-and-permissions.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`, `docs/adr/0005-supabase-ssr-authentication.md`
@@ -108,7 +108,7 @@ Notes:
   - Invitations are not implemented
   - Customer, product, sales, inventory, and work-order features are not implemented
 - **Tests:** `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:integration`, two `npm run supabase:reset` runs, `npm run db:test`, `node scripts/run-with-local-supabase-env.mjs npm run build`, and `npm run test:e2e` passed locally.
-- **Notes:** Implementation uses Supabase SSR PKCE email links with `exchangeCodeForSession()`, `src/proxy.ts` for Next.js 16 Proxy behavior, and `getClaims()` for trusted server-side identity checks. TASK-AUTH-001 remains in REVIEW until the branch is pushed and hosted GitHub Actions is green. Production rate limiting and CAPTCHA are deferred follow-up security work; no service-role key is used by this task.
+- **Notes:** Implementation uses Supabase SSR PKCE email links with `exchangeCodeForSession()`, `src/proxy.ts` for Next.js 16 Proxy behavior, and `getClaims()` for trusted server-side identity checks. Local authentication tests, Playwright E2E, and hosted GitHub Actions passed. Production rate limiting and CAPTCHA are deferred follow-up security work; no service-role key is used by this task.
 
 ### TASK-ORG-001
 
