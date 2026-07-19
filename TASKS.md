@@ -129,7 +129,7 @@ Notes:
 ### TASK-ORG-002
 
 - **Title:** Build create-organization onboarding
-- **Status:** REVIEW
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-ORG-001, TASK-AUTH-001
 - **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`, `docs/adr/0004-organization-membership-schema.md`, `docs/adr/0005-supabase-ssr-authentication.md`
@@ -142,8 +142,8 @@ Notes:
   - Existing single active membership can access dashboard
   - Multiple active memberships show a safe temporary state and do not implicitly select a tenant
   - Organization onboarding does not implement invitations, organization switching, customers, products, sales, inventory, or work orders
-- **Tests:** Local checks pending. Keep in REVIEW until local tests, Playwright onboarding flow, branch push, and hosted GitHub Actions pass.
-- **Notes:** Implementation must use the cookie-backed authenticated Supabase server client, never trust browser-supplied `user_id` or organization ownership, and avoid service-role key usage.
+- **Tests:** Local unit tests, integration tests, database tests, Playwright E2E, and hosted GitHub Actions passed.
+- **Notes:** Implementation uses the cookie-backed authenticated Supabase server client, never trusts browser-supplied `user_id` or organization ownership, avoids service-role key usage, and is complete for TASK-ORG-002.
 
 ### TASK-ORG-003
 
