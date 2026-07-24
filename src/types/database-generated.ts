@@ -59,6 +59,174 @@ export type Database = {
           },
         ];
       };
+      customer_addresses: {
+        Row: {
+          address_line_1: string;
+          address_line_2: string | null;
+          city: string | null;
+          country_code: string;
+          created_at: string;
+          customer_id: string;
+          id: string;
+          is_primary: boolean;
+          label: string;
+          latitude: number | null;
+          longitude: number | null;
+          organization_id: string;
+          postal_code: string | null;
+          province: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          address_line_1: string;
+          address_line_2?: string | null;
+          city?: string | null;
+          country_code: string;
+          created_at?: string;
+          customer_id: string;
+          id?: string;
+          is_primary?: boolean;
+          label: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          organization_id: string;
+          postal_code?: string | null;
+          province?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          address_line_1?: string;
+          address_line_2?: string | null;
+          city?: string | null;
+          country_code?: string;
+          created_at?: string;
+          customer_id?: string;
+          id?: string;
+          is_primary?: boolean;
+          label?: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          organization_id?: string;
+          postal_code?: string | null;
+          province?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_addresses_customer_org_fkey";
+            columns: ["organization_id", "customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["organization_id", "id"];
+          },
+          {
+            foreignKeyName: "customer_addresses_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      customer_tags: {
+        Row: {
+          created_at: string;
+          customer_id: string;
+          organization_id: string;
+          tag_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          customer_id: string;
+          organization_id: string;
+          tag_id: string;
+        };
+        Update: {
+          created_at?: string;
+          customer_id?: string;
+          organization_id?: string;
+          tag_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_tags_customer_org_fkey";
+            columns: ["organization_id", "customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["organization_id", "id"];
+          },
+          {
+            foreignKeyName: "customer_tags_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "customer_tags_tag_org_fkey";
+            columns: ["organization_id", "tag_id"];
+            isOneToOne: false;
+            referencedRelation: "tags";
+            referencedColumns: ["organization_id", "id"];
+          },
+        ];
+      };
+      customers: {
+        Row: {
+          archived_at: string | null;
+          company_name: string | null;
+          created_at: string;
+          created_by: string;
+          customer_type: string;
+          display_name: string;
+          email: string | null;
+          id: string;
+          notes: string | null;
+          organization_id: string;
+          phone: string | null;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          archived_at?: string | null;
+          company_name?: string | null;
+          created_at?: string;
+          created_by: string;
+          customer_type: string;
+          display_name: string;
+          email?: string | null;
+          id?: string;
+          notes?: string | null;
+          organization_id: string;
+          phone?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          company_name?: string | null;
+          created_at?: string;
+          created_by?: string;
+          customer_type?: string;
+          display_name?: string;
+          email?: string | null;
+          id?: string;
+          notes?: string | null;
+          organization_id?: string;
+          phone?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customers_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       organization_invitations: {
         Row: {
           accepted_at: string | null;
@@ -201,6 +369,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      tags: {
+        Row: {
+          color_token: string | null;
+          created_at: string;
+          id: string;
+          name: string;
+          organization_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          color_token?: string | null;
+          created_at?: string;
+          id?: string;
+          name: string;
+          organization_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          color_token?: string | null;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          organization_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tags_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -209,11 +412,20 @@ export type Database = {
       accept_organization_invitation: {
         Args: { invitation_token_hash: string };
         Returns: {
-          reactivated: boolean;
-          status: string;
-          role: string;
-          organization_id: string;
           membership_id: string;
+          organization_id: string;
+          role: string;
+          status: string;
+          reactivated: boolean;
+        }[];
+      };
+      archive_customer: {
+        Args: { target_customer_id: string };
+        Returns: {
+          status: string;
+          customer_id: string;
+          organization_id: string;
+          archived_at: string;
         }[];
       };
       citext: {
@@ -271,20 +483,36 @@ export type Database = {
           target_organization_id: string;
         };
         Returns: {
-          was_resent: boolean;
           invitation_id: string;
           organization_id: string;
           email: string;
           role: string;
           status: string;
           expires_at: string;
+          was_resent: boolean;
         }[];
+      };
+      current_user_can_archive_customers: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
       };
       current_user_can_assign_invitation_role: {
         Args: { assigned_role: string; checked_organization_id: string };
         Returns: boolean;
       };
+      current_user_can_create_customers: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
       current_user_can_invite_member: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
+      current_user_can_read_customers: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
+      current_user_can_update_customers: {
         Args: { checked_organization_id: string };
         Returns: boolean;
       };
@@ -298,6 +526,10 @@ export type Database = {
       };
       current_user_is_organization_owner: {
         Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
+      customer_is_active_in_organization: {
+        Args: { checked_customer_id: string; checked_organization_id: string };
         Returns: boolean;
       };
       get_organization_invitation_preview: {
