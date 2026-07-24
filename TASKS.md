@@ -175,9 +175,26 @@ Notes:
 ### TASK-CUS-001
 
 - **Title:** Create customer schema and RLS
-- **Status:** BACKLOG
+- **Status:** REVIEW
 - **Priority:** P1
 - **Depends on:** TASK-ORG-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - Customer, customer address, tag, and customer-tag relationship tables exist
+  - Every customer-owned table includes `organization_id`
+  - Customer identity duplicates are allowed for `display_name`, `email`, and `phone`
+  - Tags are unique per organization case-insensitively
+  - RLS isolates customer data by active organization membership
+  - Owner, Admin, and Staff can read, create, and update active customers
+  - Viewer can read customers only
+  - Technician has no broad customer access yet
+  - Disabled members, non-members, and cross-tenant users cannot access customer data
+  - Cross-tenant customer address and customer-tag references are rejected by composite foreign keys
+  - Customer hard delete is denied
+  - Customer archive is available only through the database RPC
+  - Customer UI, customer Server Actions, product, inventory, sales, and work-order features are not implemented
+- **Tests:** `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run supabase:start`, `npm run supabase:reset`, `npm run db:test`, `npm run supabase:types`, and `npm run build` passed locally.
+- **Notes:** Migration `20260725120000_create_customer_schema_and_rls.sql` adds customer foundation tables, cross-tenant composite foreign keys, case-insensitive organization-scoped tag uniqueness, customer RLS helper functions, and the database-only `archive_customer(uuid)` RPC. TASK-CUS-001 remains in REVIEW; no customer UI, Server Actions, product, inventory, sales, or work-order features are implemented.
 
 ### TASK-CUS-002
 

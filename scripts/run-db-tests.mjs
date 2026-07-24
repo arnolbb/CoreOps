@@ -2,7 +2,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
-const tests = ["organization_memberships_rls.sql", "member_invitations.sql"];
+const tests = [
+  "organization_memberships_rls.sql",
+  "member_invitations.sql",
+  "customers_rls.sql",
+];
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
