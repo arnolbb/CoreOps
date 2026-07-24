@@ -148,7 +148,7 @@ Notes:
 ### TASK-ORG-003
 
 - **Title:** Implement member invitations
-- **Status:** REVIEW
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-ORG-001
 - **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`, `docs/adr/0004-organization-membership-schema.md`, `docs/adr/0005-supabase-ssr-authentication.md`
@@ -165,7 +165,7 @@ Notes:
   - `/team`, invite form, member list, pending invitation list, and revoke controls exist
   - `/invitations/accept` and the token-link redirect set and clear the invitation cookie correctly
   - Customer, product, inventory, sales, and work-order features are not implemented
-- **Tests:** Local unit tests, integration tests, database tests, Playwright E2E, and hosted GitHub Actions passed.
+- **Tests:** Local database tests, unit tests, integration tests, Playwright E2E, production build, and hosted GitHub Actions passed.
 - **Notes:** Implementation uses the cookie-backed authenticated Supabase server client, resolves the active organization from an authenticated membership on the server, never trusts a browser-supplied organization id, avoids service-role key usage, and keeps audit logs minimal. SMTP is configurable via `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, and `INVITATION_EMAIL_FROM` without hardcoding a provider; local development defaults to Mailpit/Inbucket on port 54325.
 
 ---
