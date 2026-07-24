@@ -28,14 +28,22 @@ export default async function DashboardLayout({
               Signed in{user.email ? ` as ${user.email}` : ""}
             </p>
           </div>
-          <form action={signOutAction}>
-            <button
-              type="submit"
+          <div className="flex items-center gap-3">
+            <a
+              href="/team"
               className="rounded-md border border-black/10 px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-white/15 dark:hover:bg-zinc-900"
             >
-              Sign out
-            </button>
-          </form>
+              Team
+            </a>
+            <form action={signOutAction}>
+              <button
+                type="submit"
+                className="rounded-md border border-black/10 px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-white/15 dark:hover:bg-zinc-900"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </header>
       <div className="mx-auto max-w-5xl px-6 py-10">

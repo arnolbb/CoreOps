@@ -27,6 +27,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
     messageParam === "password-updated"
       ? AUTH_MESSAGES.passwordUpdated
       : undefined;
+  const registerHref = `/register?next=${encodeURIComponent(nextPath)}`;
 
   return (
     <AuthFormShell
@@ -36,7 +37,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
         <>
           Need an account?{" "}
           <Link
-            href="/register"
+            href={registerHref}
             className="font-medium underline underline-offset-4"
           >
             Register

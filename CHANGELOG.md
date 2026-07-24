@@ -40,6 +40,8 @@ The format follows these sections:
 - Vitest unit/integration test setup and Playwright live authentication flow against local Supabase Auth and Mailpit/Inbucket.
 - ADR-0005 recording Supabase SSR auth, `getClaims()` identity checks, and deferred production rate limiting/CAPTCHA.
 - Organization onboarding for authenticated users without active membership, backed by the atomic `create_organization` RPC and safe duplicate-slug handling.
+- Organization member invitations with hashed one-time tokens, Owner/Admin authorization, tenant-scoped RLS, preview/accept/revoke RPCs, minimal audit logs, a `/team` page, `/invitations/accept` flow, and a local Mailpit/Inbucket SMTP sender abstraction.
+- Resend of a pending invitation rotates the token hash without duplicating rows; disabled memberships are reactivated on acceptance.
 
 ### Changed
 
@@ -54,3 +56,5 @@ The format follows these sections:
 
 - Defined mandatory multi-tenant isolation and authorization standards.
 - Added RLS policies proving active membership access, non-member denial, disabled membership denial, cross-tenant read denial, cross-tenant write denial, duplicate membership rejection, and last-Owner protection.
+- Invitation tokens are stored only as SHA-256 hashes; raw tokens appear solely in the acceptance email and the HttpOnly, SameSite=Lax, Secure-in-production invitation cookie. The cookie is cleared after acceptance, expiry, revocation, or a confirmed invalid state.
+- The accept RPC rejects a caller whose authenticated email does not match the invited email; preview and accept expose no raw token or internal identifiers.

@@ -26,6 +26,11 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
       NEXT_PUBLIC_SUPABASE_ANON_KEY:
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+      SMTP_HOST: process.env.SMTP_HOST ?? "127.0.0.1",
+      SMTP_PORT: process.env.SMTP_PORT ?? "54325",
+      SMTP_SECURE: process.env.SMTP_SECURE ?? "false",
+      INVITATION_EMAIL_FROM:
+        process.env.INVITATION_EMAIL_FROM ?? "CoreOps <no-reply@coreops.local>",
     },
   },
   projects: [

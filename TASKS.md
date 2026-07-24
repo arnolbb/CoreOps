@@ -148,9 +148,25 @@ Notes:
 ### TASK-ORG-003
 
 - **Title:** Implement member invitations
-- **Status:** BACKLOG
+- **Status:** REVIEW
 - **Priority:** P1
 - **Depends on:** TASK-ORG-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`, `docs/adr/0004-organization-membership-schema.md`, `docs/adr/0005-supabase-ssr-authentication.md`
+- **Acceptance criteria:**
+  - Owner and Admin can send email invitations to add members
+  - Owner can invite Admin or Staff; Admin can invite Staff only; Staff cannot invite
+  - Invitation tokens are hashed; only the hash is stored in the database
+  - Invitation cookie is HttpOnly, SameSite=Lax, Secure in production, and cleared after acceptance, expiry, revocation, or a confirmed invalid state
+  - A signed-in user with the wrong email cannot accept an invitation
+  - Expired, revoked, and already-accepted invitations show safe states
+  - Pending invitations can be revoked by an authorized member
+  - Resending a pending invitation rotates the token hash without duplicate rows
+  - Cross-tenant invitation, preview, accept, and revoke attempts are denied
+  - `/team`, invite form, member list, pending invitation list, and revoke controls exist
+  - `/invitations/accept` and the token-link redirect set and clear the invitation cookie correctly
+  - Customer, product, inventory, sales, and work-order features are not implemented
+- **Tests:** Local unit tests, integration tests, database tests, Playwright E2E, and hosted GitHub Actions passed.
+- **Notes:** Implementation uses the cookie-backed authenticated Supabase server client, resolves the active organization from an authenticated membership on the server, never trusts a browser-supplied organization id, avoids service-role key usage, and keeps audit logs minimal. SMTP is configurable via `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, and `INVITATION_EMAIL_FROM` without hardcoding a provider; local development defaults to Mailpit/Inbucket on port 54325.
 
 ---
 
