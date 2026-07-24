@@ -7,7 +7,11 @@ import { FieldError } from "./field-error";
 import { FormMessage } from "./form-message";
 import { SubmitButton } from "./submit-button";
 
-export function RegisterForm() {
+type RegisterFormProps = {
+  nextPath: string;
+};
+
+export function RegisterForm({ nextPath }: RegisterFormProps) {
   const [state, formAction] = useActionState(
     registerAction,
     idleAuthActionState,
@@ -15,6 +19,7 @@ export function RegisterForm() {
 
   return (
     <form action={formAction} className="space-y-5" noValidate>
+      <input type="hidden" name="next" value={nextPath} />
       <FormMessage state={state} />
       <div className="space-y-2">
         <label htmlFor="email" className="text-sm font-medium">
