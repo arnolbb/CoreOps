@@ -267,20 +267,30 @@ test("customer list supports search and status filters", async ({ page }) => {
 
   await page.goto("/dashboard/customers");
   await expect(page.getByRole("heading", { name: "Customers" })).toBeVisible();
-  await expect(page.getByRole("row", { name: new RegExp(activeName) })).toBeVisible();
-  await expect(page.getByRole("row", { name: new RegExp(archivedName) })).toHaveCount(0);
+  await expect(
+    page.getByRole("row", { name: new RegExp(activeName) }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("row", { name: new RegExp(archivedName) }),
+  ).toHaveCount(0);
 
   await page
     .getByLabel("Search customers")
     .fill("searchable-customer@example.test");
   await page.getByRole("button", { name: "Apply" }).click();
   await expect(page).toHaveURL(/search=searchable-customer/);
-  await expect(page.getByRole("row", { name: new RegExp(activeName) })).toBeVisible();
+  await expect(
+    page.getByRole("row", { name: new RegExp(activeName) }),
+  ).toBeVisible();
 
   await page.getByLabel("Search customers").fill("");
   await page.getByLabel("Status").selectOption("archived");
   await page.getByRole("button", { name: "Apply" }).click();
   await expect(page).toHaveURL(/status=archived/);
-  await expect(page.getByRole("row", { name: new RegExp(archivedName) })).toBeVisible();
-  await expect(page.getByRole("row", { name: new RegExp(activeName) })).toHaveCount(0);
+  await expect(
+    page.getByRole("row", { name: new RegExp(archivedName) }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("row", { name: new RegExp(activeName) }),
+  ).toHaveCount(0);
 });
