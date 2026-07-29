@@ -278,9 +278,18 @@ Notes:
 ### TASK-INV-002
 
 - **Title:** Implement stock adjustment transaction
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-INV-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `perform_stock_adjustment` RPC guarantees atomic balance updates and transaction log appends.
+  - Non-negative balance constraint enforced for stock decreases (`adjustment_out`).
+  - Idempotency key handling prevents double deductions.
+  - Server Action `adjustStockAction` validates Zod schema and enforces server-side authentication & permission checks.
+- **Tests:** Local Supabase migration reset, database SQL RPC tests, unit tests, integration tests, lint, typecheck, and production build passed.
+- **Notes:** TASK-INV-002 completed via migration `20260801120000_create_stock_adjustment_rpc.sql`.
+
 
 ---
 

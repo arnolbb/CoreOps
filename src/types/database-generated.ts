@@ -695,28 +695,28 @@ export type Database = {
       accept_organization_invitation: {
         Args: { invitation_token_hash: string }
         Returns: {
-          status: string
           membership_id: string
           organization_id: string
           role: string
+          status: string
           reactivated: boolean
         }[]
       }
       archive_customer: {
         Args: { target_customer_id: string }
         Returns: {
-          archived_at: string
           customer_id: string
           organization_id: string
           status: string
+          archived_at: string
         }[]
       }
       archive_product: {
         Args: { target_product_id: string }
         Returns: {
           product_id: string
-          is_active: boolean
           organization_id: string
+          is_active: boolean
           archived_at: string
         }[]
       }
@@ -863,6 +863,27 @@ export type Database = {
           role: string
           status: string
           joined_at: string
+        }[]
+      }
+      perform_stock_adjustment: {
+        Args: {
+          p_adjustment_type: string
+          p_idempotency_key?: string
+          p_product_id: string
+          p_quantity: number
+          p_reason?: string
+          p_warehouse_id: string
+        }
+        Returns: {
+          transaction_id: string
+          organization_id: string
+          warehouse_id: string
+          product_id: string
+          created_at: string
+          transaction_type: string
+          quantity_delta: number
+          quantity_before: number
+          quantity_after: number
         }[]
       }
       record_organization_audit_event: {
