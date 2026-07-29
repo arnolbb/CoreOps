@@ -15,6 +15,24 @@ export type CustomerListItem = {
   archivedAt: string | null;
 };
 
+export type CustomerAddress = {
+  id: string;
+  label: string;
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string | null;
+  province: string | null;
+  postalCode: string | null;
+  countryCode: string;
+  isPrimary: boolean;
+};
+
+export type CustomerDetail = CustomerListItem & {
+  customerType: "individual" | "business";
+  notes: string | null;
+  primaryAddress: CustomerAddress | null;
+};
+
 export type CustomerListFilters = {
   search: string;
   status: CustomerListStatusFilter;
@@ -28,3 +46,4 @@ export type CustomerListData = {
   totalCount: number;
   totalPages: number;
 };
+

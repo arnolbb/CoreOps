@@ -6,3 +6,8 @@ export function canReadCustomers(role: string) {
     role === "viewer"
   );
 }
+
+export function canManageCustomers(role: string) {
+  return role === "owner" || role === "admin" || role === "staff";
+}
+

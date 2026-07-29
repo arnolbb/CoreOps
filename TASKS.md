@@ -221,9 +221,20 @@ Notes:
 ### TASK-CUS-003
 
 - **Title:** Implement customer create and edit
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-CUS-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `canManageCustomers` helper grants create/edit permissions to Owner, Admin, and Staff, and denies Viewer and Technician.
+  - Customer form schema validates input with Zod (`customerFormSchema`).
+  - `createCustomerAction` and `updateCustomerAction` enforce multi-tenancy and permission authorization server-side.
+  - Primary address insertion/upsert supported on create and edit.
+  - Non-blocking duplicate detection warning for existing email and phone.
+  - UI modal form dialog (`CustomerFormDialog`) and Header actions integrated at `/dashboard/customers`.
+- **Tests:** Unit tests, lint, typecheck, and production build passed.
+- **Notes:** TASK-CUS-003 completed. Adds customer create and edit functionality with address support and duplicate warnings.
+
 
 ---
 

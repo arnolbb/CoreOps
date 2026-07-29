@@ -1,8 +1,12 @@
+import { CustomerHeaderActions } from "@/features/customers/components/customer-header-actions";
 import { CustomerList } from "@/features/customers/components/customer-list";
 import { CustomerListFiltersForm } from "@/features/customers/components/customer-list-filters";
 import { getCustomerList } from "@/features/customers/queries/get-customer-list";
 import { parseCustomerListSearchParams } from "@/features/customers/schemas/customer-list-search-schema";
-import { canReadCustomers } from "@/features/customers/services/customer-permissions";
+import {
+  canManageCustomers,
+  canReadCustomers,
+} from "@/features/customers/services/customer-permissions";
 import { OrganizationStateMessage } from "@/features/organizations/components/organization-state-message";
 import { getActiveOrganizationState } from "@/features/organizations/queries/get-active-organization-memberships";
 import { requireAuthenticatedUser } from "@/lib/auth/session";
@@ -43,6 +47,8 @@ export default async function CustomersPage({
     );
   }
 
+  const canManage = canManageCustomers(organizationState.membership.role);
+
   const customerList = await getCustomerList(
     supabase,
     organizationState.organization.id,
@@ -68,12 +74,14 @@ export default async function CustomersPage({
             {organizationState.organization.name}.
           </p>
         </div>
-        <p className="rounded-full border border-black/10 px-3 py-1 text-sm text-zinc-600 dark:border-white/15 dark:text-zinc-400">
-          Read-only
-        </p>
+        <CustomerHeaderActions
+          canManage={canManage}
+          organizationId={organizationState.organization.id}
+        />
       </div>
       <CustomerListFiltersForm filters={customerList.data.filters} />
       <CustomerList data={customerList.data} />
     </section>
   );
 }
+
