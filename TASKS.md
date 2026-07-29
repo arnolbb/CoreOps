@@ -243,9 +243,20 @@ Notes:
 ### TASK-PRO-001
 
 - **Title:** Create product and category schema
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-ORG-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `product_categories` and `products` tables created with RLS enabled.
+  - Multi-tenant isolation enforced via `organization_id` and composite foreign keys.
+  - SKU uniqueness enforced case-insensitively per tenant.
+  - Category name uniqueness enforced case-insensitively per tenant.
+  - Immutability triggers protecting `id`, `organization_id`, `created_at`, `created_by`.
+  - Database-only RPC `archive_product(target_product_id)` with audit logging.
+- **Tests:** Local Supabase migration reset, database RLS tests, unit tests, integration tests, lint, typecheck, and production build passed.
+- **Notes:** TASK-PRO-001 completed via migration `20260730120000_create_product_schema_and_rls.sql`.
+
 
 ### TASK-INV-001
 

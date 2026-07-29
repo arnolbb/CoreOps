@@ -1,9 +1,11 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it, vi } from "vitest";
+import type { Database } from "@/types/database-generated";
 import { checkCustomerDuplicate } from "../queries/check-customer-duplicate";
 
 describe("checkCustomerDuplicate", () => {
   it("returns no duplicate when email and phone are empty", async () => {
-    const mockSupabase = {} as any;
+    const mockSupabase = {} as unknown as SupabaseClient<Database>;
     const result = await checkCustomerDuplicate(mockSupabase, "org-1", "", "");
     expect(result).toEqual({
       hasDuplicate: false,
@@ -26,7 +28,7 @@ describe("checkCustomerDuplicate", () => {
           }),
         }),
       }),
-    } as any;
+    } as unknown as SupabaseClient<Database>;
 
     const result = await checkCustomerDuplicate(
       mockSupabase,
@@ -40,3 +42,4 @@ describe("checkCustomerDuplicate", () => {
     expect(result.duplicatePhone).toBe(false);
   });
 });
+
