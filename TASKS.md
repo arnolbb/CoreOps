@@ -199,7 +199,7 @@ Notes:
 ### TASK-CUS-002
 
 - **Title:** Implement customer list and search
-- **Status:** REVIEW
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-CUS-001
 - **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
@@ -215,8 +215,8 @@ Notes:
   - Technician has no broad customer access yet
   - Disabled members, non-members, and cross-tenant users cannot access customer data
   - Customer create, edit, archive UI/actions, detail page, tags/address management UI, duplicate warnings, products, inventory, sales, and work orders are not implemented
-- **Tests:** Pending local validation.
-- **Notes:** In review for TASK-CUS-002 implementation.
+- **Tests:** Unit, integration, database RLS, Playwright E2E, and production build passed.
+- **Notes:** TASK-CUS-002 merged via PR #12. Adds customer listing, search, status filter, and pagination at `/dashboard/customers`.
 
 ### TASK-CUS-003
 
