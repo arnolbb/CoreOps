@@ -227,6 +227,128 @@ export type Database = {
           },
         ]
       }
+      inventory_balances: {
+        Row: {
+          organization_id: string
+          product_id: string
+          quantity: number
+          updated_at: string
+          version: number
+          warehouse_id: string
+        }
+        Insert: {
+          organization_id: string
+          product_id: string
+          quantity?: number
+          updated_at?: string
+          version?: number
+          warehouse_id: string
+        }
+        Update: {
+          organization_id?: string
+          product_id?: string
+          quantity?: number
+          updated_at?: string
+          version?: number
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_balances_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_balances_product_org_fkey"
+            columns: ["organization_id", "product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "inventory_balances_warehouse_org_fkey"
+            columns: ["organization_id", "warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      inventory_transactions: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          idempotency_key: string | null
+          organization_id: string
+          product_id: string
+          quantity_after: number
+          quantity_before: number
+          quantity_delta: number
+          reason: string | null
+          reference_id: string | null
+          reference_type: string | null
+          transaction_type: string
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          idempotency_key?: string | null
+          organization_id: string
+          product_id: string
+          quantity_after: number
+          quantity_before: number
+          quantity_delta: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type: string
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          idempotency_key?: string | null
+          organization_id?: string
+          product_id?: string
+          quantity_after?: number
+          quantity_before?: number
+          quantity_delta?: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transactions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_product_org_fkey"
+            columns: ["organization_id", "product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_warehouse_org_fkey"
+            columns: ["organization_id", "warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       organization_invitations: {
         Row: {
           accepted_at: string | null
@@ -524,6 +646,47 @@ export type Database = {
           },
         ]
       }
+      warehouses: {
+        Row: {
+          address: string | null
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "warehouses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -532,29 +695,29 @@ export type Database = {
       accept_organization_invitation: {
         Args: { invitation_token_hash: string }
         Returns: {
+          status: string
           membership_id: string
           organization_id: string
           role: string
-          status: string
           reactivated: boolean
         }[]
       }
       archive_customer: {
         Args: { target_customer_id: string }
         Returns: {
+          archived_at: string
           customer_id: string
           organization_id: string
           status: string
-          archived_at: string
         }[]
       }
       archive_product: {
         Args: { target_product_id: string }
         Returns: {
-          archived_at: string
           product_id: string
-          organization_id: string
           is_active: boolean
+          organization_id: string
+          archived_at: string
         }[]
       }
       citext: {
@@ -612,8 +775,8 @@ export type Database = {
           target_organization_id: string
         }
         Returns: {
-          organization_id: string
           invitation_id: string
+          organization_id: string
           email: string
           role: string
           status: string
@@ -641,11 +804,19 @@ export type Database = {
         Args: { checked_organization_id: string }
         Returns: boolean
       }
+      current_user_can_manage_inventory: {
+        Args: { checked_organization_id: string }
+        Returns: boolean
+      }
       current_user_can_manage_products: {
         Args: { checked_organization_id: string }
         Returns: boolean
       }
       current_user_can_read_customers: {
+        Args: { checked_organization_id: string }
+        Returns: boolean
+      }
+      current_user_can_read_inventory: {
         Args: { checked_organization_id: string }
         Returns: boolean
       }

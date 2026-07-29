@@ -261,9 +261,19 @@ Notes:
 ### TASK-INV-001
 
 - **Title:** Create warehouse and inventory ledger schema
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-PRO-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `warehouses`, `inventory_balances`, and `inventory_transactions` tables created with RLS enabled.
+  - Multi-tenant isolation enforced via `organization_id` and composite foreign keys.
+  - Warehouse code uniqueness enforced case-insensitively per tenant.
+  - Idempotency key uniqueness enforced per tenant for transactions.
+  - Inventory transactions enforced as append-only via immutability trigger.
+- **Tests:** Local Supabase migration reset, database RLS tests, unit tests, integration tests, lint, typecheck, and production build passed.
+- **Notes:** TASK-INV-001 completed via migration `20260731120000_create_inventory_schema_and_rls.sql`.
+
 
 ### TASK-INV-002
 
