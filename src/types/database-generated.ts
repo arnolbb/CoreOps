@@ -491,6 +491,72 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          organization_id: string
+          paid_at: string
+          payment_method: string
+          reference: string | null
+          sales_order_id: string
+          status: string
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          organization_id: string
+          paid_at?: string
+          payment_method: string
+          reference?: string | null
+          sales_order_id: string
+          status?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          paid_at?: string
+          payment_method?: string
+          reference?: string | null
+          sales_order_id?: string
+          status?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_sales_order_org_fkey"
+            columns: ["organization_id", "sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           created_at: string
@@ -611,6 +677,160 @@ export type Database = {
           },
         ]
       }
+      sales_order_items: {
+        Row: {
+          created_at: string
+          discount_amount: number
+          id: string
+          item_type: string
+          line_total: number
+          name_snapshot: string
+          organization_id: string
+          product_id: string | null
+          quantity: number
+          sales_order_id: string
+          sku_snapshot: string | null
+          tax_amount: number
+          unit_price: number
+          unit_snapshot: string
+        }
+        Insert: {
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          item_type: string
+          line_total?: number
+          name_snapshot: string
+          organization_id: string
+          product_id?: string | null
+          quantity: number
+          sales_order_id: string
+          sku_snapshot?: string | null
+          tax_amount?: number
+          unit_price?: number
+          unit_snapshot: string
+        }
+        Update: {
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          item_type?: string
+          line_total?: number
+          name_snapshot?: string
+          organization_id?: string
+          product_id?: string | null
+          quantity?: number
+          sales_order_id?: string
+          sku_snapshot?: string | null
+          tax_amount?: number
+          unit_price?: number
+          unit_snapshot?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_order_items_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_order_items_product_org_fkey"
+            columns: ["organization_id", "product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_order_items_sales_order_org_fkey"
+            columns: ["organization_id", "sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      sales_orders: {
+        Row: {
+          cancelled_at: string | null
+          completed_at: string | null
+          confirmed_at: string | null
+          created_at: string
+          created_by: string
+          currency_code: string
+          customer_id: string
+          discount_total: number
+          grand_total: number
+          id: string
+          notes: string | null
+          order_number: string
+          organization_id: string
+          paid_total: number
+          payment_status: string
+          status: string
+          subtotal: number
+          tax_total: number
+          updated_at: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          created_by: string
+          currency_code?: string
+          customer_id: string
+          discount_total?: number
+          grand_total?: number
+          id?: string
+          notes?: string | null
+          order_number: string
+          organization_id: string
+          paid_total?: number
+          payment_status?: string
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          customer_id?: string
+          discount_total?: number
+          grand_total?: number
+          id?: string
+          notes?: string | null
+          order_number?: string
+          organization_id?: string
+          paid_total?: number
+          payment_status?: string
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_orders_customer_org_fkey"
+            columns: ["organization_id", "customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_orders_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           color_token: string | null
@@ -705,19 +925,19 @@ export type Database = {
       archive_customer: {
         Args: { target_customer_id: string }
         Returns: {
+          status: string
           customer_id: string
           organization_id: string
-          status: string
           archived_at: string
         }[]
       }
       archive_product: {
         Args: { target_product_id: string }
         Returns: {
-          product_id: string
-          organization_id: string
           is_active: boolean
           archived_at: string
+          product_id: string
+          organization_id: string
         }[]
       }
       citext: {
@@ -812,6 +1032,10 @@ export type Database = {
         Args: { checked_organization_id: string }
         Returns: boolean
       }
+      current_user_can_manage_sales: {
+        Args: { checked_organization_id: string }
+        Returns: boolean
+      }
       current_user_can_read_customers: {
         Args: { checked_organization_id: string }
         Returns: boolean
@@ -821,6 +1045,10 @@ export type Database = {
         Returns: boolean
       }
       current_user_can_read_products: {
+        Args: { checked_organization_id: string }
+        Returns: boolean
+      }
+      current_user_can_read_sales: {
         Args: { checked_organization_id: string }
         Returns: boolean
       }
@@ -875,15 +1103,15 @@ export type Database = {
           p_warehouse_id: string
         }
         Returns: {
+          transaction_type: string
+          quantity_delta: number
           transaction_id: string
           organization_id: string
           warehouse_id: string
           product_id: string
-          created_at: string
-          transaction_type: string
-          quantity_delta: number
-          quantity_before: number
           quantity_after: number
+          created_at: string
+          quantity_before: number
         }[]
       }
       record_organization_audit_event: {

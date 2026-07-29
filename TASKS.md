@@ -298,9 +298,18 @@ Notes:
 ### TASK-SAL-001
 
 - **Title:** Create sales order schema
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-CUS-001, TASK-PRO-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `sales_orders`, `sales_order_items`, and `payments` tables created with RLS enabled.
+  - Multi-tenant isolation enforced via `organization_id` and composite foreign keys to customers, products, and sales orders.
+  - Order number uniqueness enforced case-insensitively per tenant.
+  - Fixed-precision numeric types (`numeric(18,2)` / `numeric(18,3)`) for financial totals and quantities.
+- **Tests:** Local Supabase migration reset, database RLS tests, unit tests, integration tests, lint, typecheck, and production build passed.
+- **Notes:** TASK-SAL-001 completed via migration `20260802120000_create_sales_schema_and_rls.sql`.
+
 
 ### TASK-SAL-002
 
