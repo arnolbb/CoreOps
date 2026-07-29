@@ -199,9 +199,24 @@ Notes:
 ### TASK-CUS-002
 
 - **Title:** Implement customer list and search
-- **Status:** BACKLOG
+- **Status:** REVIEW
 - **Priority:** P1
 - **Depends on:** TASK-CUS-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `/dashboard/customers` lists customer records for the active organization
+  - Customer search supports `display_name`, `company_name`, `email`, and `phone`
+  - Status filter supports active, archived, and all customers
+  - Pagination exists for customer results
+  - Customer page handles loading, empty, success, authorization error, and unexpected error states
+  - Responsive table/card layout exists
+  - Customer list is read-only
+  - Owner, Admin, Staff, and Viewer can read customers
+  - Technician has no broad customer access yet
+  - Disabled members, non-members, and cross-tenant users cannot access customer data
+  - Customer create, edit, archive UI/actions, detail page, tags/address management UI, duplicate warnings, products, inventory, sales, and work orders are not implemented
+- **Tests:** Pending local validation.
+- **Notes:** In review for TASK-CUS-002 implementation.
 
 ### TASK-CUS-003
 
