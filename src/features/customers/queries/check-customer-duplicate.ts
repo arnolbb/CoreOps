@@ -7,6 +7,33 @@ export type DuplicateCheckResult = {
   duplicatePhone: boolean;
 };
 
+async function hasMatchingActiveCustomer(
+  supabase: SupabaseClient<Database>,
+  organizationId: string,
+  column: "email" | "phone",
+  value: string,
+  excludeCustomerId?: string,
+): Promise<boolean> {
+  let query = supabase
+    .from("customers")
+    .select("id")
+    .eq("organization_id", organizationId)
+    .eq("status", "active")
+    .eq(column, value);
+
+  if (excludeCustomerId) {
+    query = query.neq("id", excludeCustomerId);
+  }
+
+  const { data, error } = await query.limit(1);
+
+  if (error || !data) {
+    return false;
+  }
+
+  return data.length > 0;
+}
+
 export async function checkCustomerDuplicate(
   supabase: SupabaseClient<Database>,
   organizationId: string,
@@ -25,47 +52,26 @@ export async function checkCustomerDuplicate(
     };
   }
 
-  let query = supabase
-    .from("customers")
-    .select("id, email, phone")
-    .eq("organization_id", organizationId)
-    .eq("status", "active");
-
-  if (excludeCustomerId) {
-    query = query.neq("id", excludeCustomerId);
-  }
-
-  const filters: string[] = [];
-  if (cleanEmail) {
-    filters.push(`email.ilike.${cleanEmail}`);
-  }
-  if (cleanPhone) {
-    filters.push(`phone.eq.${cleanPhone}`);
-  }
-
-  query = query.or(filters.join(","));
-
-  const { data, error } = await query;
-
-  if (error || !data || data.length === 0) {
-    return {
-      hasDuplicate: false,
-      duplicateEmail: false,
-      duplicatePhone: false,
-    };
-  }
-
-  let duplicateEmail = false;
-  let duplicatePhone = false;
-
-  for (const row of data) {
-    if (cleanEmail && row.email && row.email.toLowerCase() === cleanEmail.toLowerCase()) {
-      duplicateEmail = true;
-    }
-    if (cleanPhone && row.phone && row.phone === cleanPhone) {
-      duplicatePhone = true;
-    }
-  }
+  const [duplicateEmail, duplicatePhone] = await Promise.all([
+    cleanEmail
+      ? hasMatchingActiveCustomer(
+          supabase,
+          organizationId,
+          "email",
+          cleanEmail,
+          excludeCustomerId,
+        )
+      : Promise.resolve(false),
+    cleanPhone
+      ? hasMatchingActiveCustomer(
+          supabase,
+          organizationId,
+          "phone",
+          cleanPhone,
+          excludeCustomerId,
+        )
+      : Promise.resolve(false),
+  ]);
 
   return {
     hasDuplicate: duplicateEmail || duplicatePhone,

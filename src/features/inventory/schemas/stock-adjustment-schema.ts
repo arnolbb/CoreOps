@@ -16,16 +16,17 @@ export const stockAdjustmentSchema = z.object({
     .max(2000, "Reason must be at most 2000 characters")
     .nullable()
     .optional()
-    .transform((val) => (val === "" ? null : val ?? null)),
+    .transform((val) => (val === "" ? null : (val ?? null))),
   idempotencyKey: z
     .string()
     .trim()
     .max(128, "Idempotency key too long")
     .nullable()
     .optional()
-    .transform((val) => (val === "" ? null : val ?? null)),
+    .transform((val) => (val === "" ? null : (val ?? null))),
 });
 
 export type StockAdjustmentValues = z.input<typeof stockAdjustmentSchema>;
-export type StockAdjustmentParsedValues = z.output<typeof stockAdjustmentSchema>;
-
+export type StockAdjustmentParsedValues = z.output<
+  typeof stockAdjustmentSchema
+>;

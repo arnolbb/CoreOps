@@ -71,7 +71,16 @@ jobs:
           migration_list="$(npx supabase migration list --local)"
           printf '%s\n' "$migration_list"
 
-          for migration in 20260718210437 20260718230000; do
+          for migration in \
+            20260718210437 \
+            20260718230000 \
+            20260719120000 \
+            20260725120000 \
+            20260730120000 \
+            20260731120000 \
+            20260801120000 \
+            20260802120000 \
+            20260803120000; do
             if ! grep -Fq "$migration" <<<"$migration_list"; then
               printf 'ERROR: Expected local migration %s is absent.\n' "$migration" >&2
               exit 1

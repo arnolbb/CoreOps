@@ -232,9 +232,8 @@ Notes:
   - Primary address insertion/upsert supported on create and edit.
   - Non-blocking duplicate detection warning for existing email and phone.
   - UI modal form dialog (`CustomerFormDialog`) and Header actions integrated at `/dashboard/customers`.
-- **Tests:** Unit tests, lint, typecheck, and production build passed.
-- **Notes:** TASK-CUS-003 completed. Adds customer create and edit functionality with address support and duplicate warnings.
-
+- **Tests:** Unit tests, integration tests, lint, and typecheck passed locally. Live local Supabase DB tests (`db:test`) and E2E pending Docker verification.
+- **Notes:** TASK-CUS-003 completed and hardened. Adds customer create and edit UI (including row/card Edit action), server-resolved duplicate check and edit-detail actions, primary address error handling, and UUID/active-row checks.
 
 ---
 
@@ -257,7 +256,6 @@ Notes:
 - **Tests:** Local Supabase migration reset, database RLS tests, unit tests, integration tests, lint, typecheck, and production build passed.
 - **Notes:** TASK-PRO-001 completed via migration `20260730120000_create_product_schema_and_rls.sql`.
 
-
 ### TASK-INV-001
 
 - **Title:** Create warehouse and inventory ledger schema
@@ -274,7 +272,6 @@ Notes:
 - **Tests:** Local Supabase migration reset, database RLS tests, unit tests, integration tests, lint, typecheck, and production build passed.
 - **Notes:** TASK-INV-001 completed via migration `20260731120000_create_inventory_schema_and_rls.sql`.
 
-
 ### TASK-INV-002
 
 - **Title:** Implement stock adjustment transaction
@@ -288,8 +285,7 @@ Notes:
   - Idempotency key handling prevents double deductions.
   - Server Action `adjustStockAction` validates Zod schema and enforces server-side authentication & permission checks.
 - **Tests:** Local Supabase migration reset, database SQL RPC tests, unit tests, integration tests, lint, typecheck, and production build passed.
-- **Notes:** TASK-INV-002 completed via migration `20260801120000_create_stock_adjustment_rpc.sql`.
-
+- **Notes:** TASK-INV-002 completed via migrations `20260801120000_create_stock_adjustment_rpc.sql` and `20260803120000_fix_stock_adjustment_rpc.sql` (fixes PL/pgSQL column ambiguity, blank idempotency keys, and inactive warehouse check), plus explicit permission checks and safe error mapping in `adjustStockAction`.
 
 ---
 
@@ -309,7 +305,6 @@ Notes:
   - Fixed-precision numeric types (`numeric(18,2)` / `numeric(18,3)`) for financial totals and quantities.
 - **Tests:** Local Supabase migration reset, database RLS tests, unit tests, integration tests, lint, typecheck, and production build passed.
 - **Notes:** TASK-SAL-001 completed via migration `20260802120000_create_sales_schema_and_rls.sql`.
-
 
 ### TASK-SAL-002
 

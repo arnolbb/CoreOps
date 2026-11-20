@@ -1,3 +1,4 @@
+import { CustomerEditButton } from "./customer-edit-button";
 import { CustomerListPagination } from "./customer-list-pagination";
 import { CustomerStatusBadge } from "./customer-status-badge";
 import type { CustomerListData, CustomerListItem } from "../types/customer";
@@ -26,7 +27,13 @@ function ContactSummary({ customer }: { customer: CustomerListItem }) {
   );
 }
 
-function CustomerCards({ customers }: { customers: CustomerListItem[] }) {
+function CustomerCards({
+  customers,
+  canManage,
+}: {
+  customers: CustomerListItem[];
+  canManage: boolean;
+}) {
   return (
     <div className="grid gap-3 md:hidden">
       {customers.map((customer) => (
@@ -64,13 +71,27 @@ function CustomerCards({ customers }: { customers: CustomerListItem[] }) {
               </dd>
             </div>
           </dl>
+          {canManage && customer.status === "active" ? (
+            <div className="mt-4 flex justify-end border-t border-black/10 pt-3 dark:border-white/15">
+              <CustomerEditButton
+                customerId={customer.id}
+                customerName={customer.displayName}
+              />
+            </div>
+          ) : null}
         </article>
       ))}
     </div>
   );
 }
 
-function CustomerTable({ customers }: { customers: CustomerListItem[] }) {
+function CustomerTable({
+  customers,
+  canManage,
+}: {
+  customers: CustomerListItem[];
+  canManage: boolean;
+}) {
   return (
     <div className="hidden overflow-hidden rounded-2xl border border-black/10 bg-white dark:border-white/15 dark:bg-zinc-950 md:block">
       <table className="min-w-full divide-y divide-black/10 text-sm dark:divide-white/15">
@@ -89,6 +110,11 @@ function CustomerTable({ customers }: { customers: CustomerListItem[] }) {
             <th scope="col" className="px-4 py-3">
               Updated
             </th>
+            {canManage ? (
+              <th scope="col" className="px-4 py-3 text-right">
+                Actions
+              </th>
+            ) : null}
           </tr>
         </thead>
         <tbody className="divide-y divide-black/10 dark:divide-white/15">
@@ -112,6 +138,18 @@ function CustomerTable({ customers }: { customers: CustomerListItem[] }) {
               <td className="px-4 py-4 align-top text-zinc-600 dark:text-zinc-400">
                 {formatDate(customer.updatedAt)}
               </td>
+              {canManage ? (
+                <td className="px-4 py-4 text-right align-top">
+                  {customer.status === "active" ? (
+                    <CustomerEditButton
+                      customerId={customer.id}
+                      customerName={customer.displayName}
+                    />
+                  ) : (
+                    <span className="text-xs text-zinc-400">Archived</span>
+                  )}
+                </td>
+              ) : null}
             </tr>
           ))}
         </tbody>
@@ -120,14 +158,20 @@ function CustomerTable({ customers }: { customers: CustomerListItem[] }) {
   );
 }
 
-export function CustomerList({ data }: { data: CustomerListData }) {
+export function CustomerList({
+  data,
+  canManage = false,
+}: {
+  data: CustomerListData;
+  canManage?: boolean;
+}) {
   if (data.items.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-black/15 p-8 dark:border-white/20">
         <h2 className="text-lg font-medium">No customers found.</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          Customer records will appear here after they are added in the customer
-          management task. Adjust search or filters to check archived customers.
+          Add your first customer to track orders and service work, or adjust
+          search and status filters to check archived customers.
         </p>
       </div>
     );
@@ -135,8 +179,8 @@ export function CustomerList({ data }: { data: CustomerListData }) {
 
   return (
     <div className="space-y-4">
-      <CustomerCards customers={data.items} />
-      <CustomerTable customers={data.items} />
+      <CustomerCards customers={data.items} canManage={canManage} />
+      <CustomerTable customers={data.items} canManage={canManage} />
       <CustomerListPagination data={data} />
     </div>
   );

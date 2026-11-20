@@ -6,6 +6,10 @@ const tests = [
   "organization_memberships_rls.sql",
   "member_invitations.sql",
   "customers_rls.sql",
+  "products_rls.sql",
+  "inventory_rls.sql",
+  "stock_adjustment_rpc.sql",
+  "sales_rls.sql",
 ];
 
 function run(command, args, options = {}) {

@@ -6,7 +6,9 @@ export async function getCustomerDetail(
   supabase: SupabaseClient<Database>,
   organizationId: string,
   customerId: string,
-): Promise<{ ok: true; data: CustomerDetail } | { ok: false; message: string }> {
+): Promise<
+  { ok: true; data: CustomerDetail } | { ok: false; message: string }
+> {
   const { data: customer, error } = await supabase
     .from("customers")
     .select(
@@ -29,7 +31,8 @@ export async function getCustomerDetail(
     .eq("customer_id", customerId)
     .order("is_primary", { ascending: false });
 
-  const primaryAddressRow = addresses?.find((a) => a.is_primary) ?? addresses?.[0];
+  const primaryAddressRow =
+    addresses?.find((a) => a.is_primary) ?? addresses?.[0];
 
   const primaryAddress: CustomerAddress | null = primaryAddressRow
     ? {

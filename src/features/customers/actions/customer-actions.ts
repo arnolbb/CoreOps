@@ -1,14 +1,29 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { getActiveOrganizationState } from "@/features/organizations/queries/get-active-organization-memberships";
 import { requireAuthenticatedUser } from "@/lib/auth/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
+  checkCustomerDuplicate,
+  type DuplicateCheckResult,
+} from "../queries/check-customer-duplicate";
+import { getCustomerDetail } from "../queries/get-customer-detail";
+import {
   customerFormSchema,
   type CustomerFormValues,
 } from "../schemas/customer-form-schema";
-import { canManageCustomers } from "../services/customer-permissions";
+import {
+  canManageCustomers,
+  canReadCustomers,
+} from "../services/customer-permissions";
+import type { CustomerDetail } from "../types/customer";
+
+const customerIdSchema = z.string().uuid();
+
+const PERMISSION_DENIED_MESSAGE =
+  "You do not have access to perform this action.";
 
 export type CustomerActionResult =
   | {
@@ -20,6 +35,16 @@ export type CustomerActionResult =
       ok: false;
       message: string;
       fieldErrors?: Record<string, string[]>;
+    };
+
+export type CustomerDetailActionResult =
+  | {
+      ok: true;
+      data: CustomerDetail;
+    }
+  | {
+      ok: false;
+      message: string;
     };
 
 export async function createCustomerAction(
@@ -34,7 +59,7 @@ export async function createCustomerAction(
   }
 
   if (!canManageCustomers(organizationState.membership.role)) {
-    return { ok: false, message: "Permission denied. Owner, Admin, or Staff role required." };
+    return { ok: false, message: PERMISSION_DENIED_MESSAGE };
   }
 
   const parsed = customerFormSchema.safeParse(values);
@@ -89,7 +114,12 @@ export async function createCustomerAction(
       });
 
     if (addressError) {
-      // Non-fatal if customer created, but surface error or ignore
+      revalidatePath("/dashboard/customers");
+      return {
+        ok: false,
+        message:
+          "Customer was created, but the primary address could not be saved. Edit the customer to try again.",
+      };
     }
   }
 
@@ -98,7 +128,7 @@ export async function createCustomerAction(
   return {
     ok: true,
     customerId: customer.id,
-    message: "Customer created successfully.",
+    message: "Customer created.",
   };
 }
 
@@ -115,7 +145,12 @@ export async function updateCustomerAction(
   }
 
   if (!canManageCustomers(organizationState.membership.role)) {
-    return { ok: false, message: "Permission denied. Owner, Admin, or Staff role required." };
+    return { ok: false, message: PERMISSION_DENIED_MESSAGE };
+  }
+
+  const parsedCustomerId = customerIdSchema.safeParse(customerId);
+  if (!parsedCustomerId.success) {
+    return { ok: false, message: "Invalid customer identifier." };
   }
 
   const parsed = customerFormSchema.safeParse(values);
@@ -129,8 +164,9 @@ export async function updateCustomerAction(
 
   const data = parsed.data;
   const organizationId = organizationState.organization.id;
+  const validCustomerId = parsedCustomerId.data;
 
-  const { error: customerError } = await supabase
+  const { data: updatedCustomer, error: customerError } = await supabase
     .from("customers")
     .update({
       customer_type: data.customerType,
@@ -141,8 +177,10 @@ export async function updateCustomerAction(
       notes: data.notes,
     })
     .eq("organization_id", organizationId)
-    .eq("id", customerId)
-    .eq("status", "active");
+    .eq("id", validCustomerId)
+    .eq("status", "active")
+    .select("id")
+    .maybeSingle();
 
   if (customerError) {
     return {
@@ -151,17 +189,33 @@ export async function updateCustomerAction(
     };
   }
 
+  if (!updatedCustomer) {
+    return {
+      ok: false,
+      message: "Customer not found or cannot be edited.",
+    };
+  }
+
   if (data.addressLine1) {
-    const { data: existingAddresses } = await supabase
+    const { data: existingAddresses, error: lookupError } = await supabase
       .from("customer_addresses")
       .select("id")
       .eq("organization_id", organizationId)
-      .eq("customer_id", customerId)
+      .eq("customer_id", validCustomerId)
       .eq("is_primary", true)
       .limit(1);
 
+    if (lookupError) {
+      revalidatePath("/dashboard/customers");
+      return {
+        ok: false,
+        message:
+          "Customer details were saved, but the primary address could not be updated.",
+      };
+    }
+
     if (existingAddresses && existingAddresses.length > 0) {
-      await supabase
+      const { error: addressUpdateError } = await supabase
         .from("customer_addresses")
         .update({
           label: data.addressLabel || "Primary",
@@ -172,20 +226,41 @@ export async function updateCustomerAction(
           postal_code: data.postalCode,
           country_code: data.countryCode,
         })
+        .eq("organization_id", organizationId)
         .eq("id", existingAddresses[0].id);
+
+      if (addressUpdateError) {
+        revalidatePath("/dashboard/customers");
+        return {
+          ok: false,
+          message:
+            "Customer details were saved, but the primary address could not be updated.",
+        };
+      }
     } else {
-      await supabase.from("customer_addresses").insert({
-        organization_id: organizationId,
-        customer_id: customerId,
-        label: data.addressLabel || "Primary",
-        address_line_1: data.addressLine1,
-        address_line_2: data.addressLine2,
-        city: data.city,
-        province: data.province,
-        postal_code: data.postalCode,
-        country_code: data.countryCode,
-        is_primary: true,
-      });
+      const { error: addressInsertError } = await supabase
+        .from("customer_addresses")
+        .insert({
+          organization_id: organizationId,
+          customer_id: validCustomerId,
+          label: data.addressLabel || "Primary",
+          address_line_1: data.addressLine1,
+          address_line_2: data.addressLine2,
+          city: data.city,
+          province: data.province,
+          postal_code: data.postalCode,
+          country_code: data.countryCode,
+          is_primary: true,
+        });
+
+      if (addressInsertError) {
+        revalidatePath("/dashboard/customers");
+        return {
+          ok: false,
+          message:
+            "Customer details were saved, but the primary address could not be updated.",
+        };
+      }
     }
   }
 
@@ -193,7 +268,71 @@ export async function updateCustomerAction(
 
   return {
     ok: true,
-    customerId,
-    message: "Customer updated successfully.",
+    customerId: validCustomerId,
+    message: "Customer updated.",
   };
+}
+
+export async function getCustomerForEditAction(
+  customerId: string,
+): Promise<CustomerDetailActionResult> {
+  const user = await requireAuthenticatedUser();
+  const supabase = await createSupabaseServerClient();
+  const organizationState = await getActiveOrganizationState(supabase, user.id);
+
+  if (organizationState.status !== "single") {
+    return { ok: false, message: "Active organization required." };
+  }
+
+  if (!canManageCustomers(organizationState.membership.role)) {
+    return { ok: false, message: PERMISSION_DENIED_MESSAGE };
+  }
+
+  const parsedCustomerId = customerIdSchema.safeParse(customerId);
+  if (!parsedCustomerId.success) {
+    return { ok: false, message: "Invalid customer identifier." };
+  }
+
+  return getCustomerDetail(
+    supabase,
+    organizationState.organization.id,
+    parsedCustomerId.data,
+  );
+}
+
+export async function checkCustomerDuplicateAction(
+  email: string | null | undefined,
+  phone: string | null | undefined,
+  excludeCustomerId?: string,
+): Promise<DuplicateCheckResult> {
+  const emptyResult: DuplicateCheckResult = {
+    hasDuplicate: false,
+    duplicateEmail: false,
+    duplicatePhone: false,
+  };
+
+  const user = await requireAuthenticatedUser();
+  const supabase = await createSupabaseServerClient();
+  const organizationState = await getActiveOrganizationState(supabase, user.id);
+
+  if (organizationState.status !== "single") {
+    return emptyResult;
+  }
+
+  if (!canReadCustomers(organizationState.membership.role)) {
+    return emptyResult;
+  }
+
+  const safeExcludeId =
+    excludeCustomerId && customerIdSchema.safeParse(excludeCustomerId).success
+      ? excludeCustomerId
+      : undefined;
+
+  return checkCustomerDuplicate(
+    supabase,
+    organizationState.organization.id,
+    email,
+    phone,
+    safeExcludeId,
+  );
 }

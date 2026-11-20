@@ -8,6 +8,7 @@ import {
   stockAdjustmentSchema,
   type StockAdjustmentValues,
 } from "../schemas/stock-adjustment-schema";
+import { canManageInventory } from "../services/inventory-permissions";
 
 export type StockAdjustmentActionResult =
   | {
@@ -23,6 +24,33 @@ export type StockAdjustmentActionResult =
       fieldErrors?: Record<string, string[]>;
     };
 
+const SAFE_STOCK_ADJUSTMENT_FALLBACK =
+  "Unable to perform stock adjustment. Try again.";
+
+function mapStockAdjustmentRpcError(message?: string | null): string {
+  switch (message) {
+    case "insufficient stock balance":
+      return "Insufficient stock balance for this adjustment.";
+    case "warehouse not found":
+      return "Selected warehouse was not found.";
+    case "cannot adjust stock for inactive warehouse":
+      return "Cannot adjust stock for an inactive warehouse.";
+    case "product not found in warehouse organization":
+      return "Selected product was not found.";
+    case "cannot adjust stock for inactive or archived product":
+      return "Cannot adjust stock for an inactive or archived product.";
+    case "inventory permission denied":
+    case "inventory authentication required":
+      return "You do not have access to perform this action.";
+    case "adjustment quantity must be positive":
+      return "Quantity must be greater than zero.";
+    case "invalid adjustment type":
+      return "Invalid adjustment type.";
+    default:
+      return SAFE_STOCK_ADJUSTMENT_FALLBACK;
+  }
+}
+
 export async function adjustStockAction(
   values: StockAdjustmentValues,
 ): Promise<StockAdjustmentActionResult> {
@@ -32,6 +60,13 @@ export async function adjustStockAction(
 
   if (organizationState.status !== "single") {
     return { ok: false, message: "Active organization required." };
+  }
+
+  if (!canManageInventory(organizationState.membership.role)) {
+    return {
+      ok: false,
+      message: "You do not have access to perform this action.",
+    };
   }
 
   const parsed = stockAdjustmentSchema.safeParse(values);
@@ -45,19 +80,22 @@ export async function adjustStockAction(
 
   const data = parsed.data;
 
-  const { data: rpcData, error } = await supabase.rpc("perform_stock_adjustment", {
-    p_warehouse_id: data.warehouseId,
-    p_product_id: data.productId,
-    p_adjustment_type: data.adjustmentType,
-    p_quantity: data.quantity,
-    p_reason: data.reason ?? undefined,
-    p_idempotency_key: data.idempotencyKey ?? undefined,
-  });
+  const { data: rpcData, error } = await supabase.rpc(
+    "perform_stock_adjustment",
+    {
+      p_warehouse_id: data.warehouseId,
+      p_product_id: data.productId,
+      p_adjustment_type: data.adjustmentType,
+      p_quantity: data.quantity,
+      p_reason: data.reason ?? undefined,
+      p_idempotency_key: data.idempotencyKey ?? undefined,
+    },
+  );
 
   if (error || !rpcData || rpcData.length === 0) {
     return {
       ok: false,
-      message: error?.message ?? "Unable to perform stock adjustment.",
+      message: mapStockAdjustmentRpcError(error?.message),
     };
   }
 
@@ -71,6 +109,6 @@ export async function adjustStockAction(
     transactionId: row.transaction_id,
     quantityBefore: Number(row.quantity_before),
     quantityAfter: Number(row.quantity_after),
-    message: "Stock adjustment applied successfully.",
+    message: "Stock adjustment applied.",
   };
 }

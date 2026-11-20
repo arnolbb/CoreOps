@@ -74,14 +74,10 @@ export default async function CustomersPage({
             {organizationState.organization.name}.
           </p>
         </div>
-        <CustomerHeaderActions
-          canManage={canManage}
-          organizationId={organizationState.organization.id}
-        />
+        <CustomerHeaderActions canManage={canManage} />
       </div>
       <CustomerListFiltersForm filters={customerList.data.filters} />
-      <CustomerList data={customerList.data} />
+      <CustomerList data={customerList.data} canManage={canManage} />
     </section>
   );
 }
-

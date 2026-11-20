@@ -46,4 +46,3 @@ export type CustomerListData = {
   totalCount: number;
   totalPages: number;
 };
-
