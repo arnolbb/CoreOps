@@ -46,6 +46,7 @@ The format follows these sections:
 - Customer list page at `/dashboard/customers` with search, status filter, pagination, and responsive table/card layout (`TASK-CUS-002`).
 - Customer create and edit modal workflow with primary address support, server-side non-blocking duplicate warning, and Edit row actions for active customers (`TASK-CUS-003`).
 - Product and category schema, case-insensitive tenant-scoped SKU/category uniqueness, RLS, and audited `archive_product` RPC (`TASK-PRO-001`).
+- Product and category management page at `/dashboard/products` with search, status/type/category filters, pagination, create/edit/archive product workflows, category management dialog, role-scoped `cost_price` visibility, and dashboard navigation link (`TASK-PRO-002`).
 - Warehouse, inventory balance, and append-only inventory transaction ledger schema and RLS (`TASK-INV-001`).
 - Atomic `perform_stock_adjustment` RPC and `adjustStockAction` server action with idempotency, permission checks, and safe error mapping (`TASK-INV-002`).
 - Sales orders, sales order items, and payments schema and RLS with fixed-precision numeric totals (`TASK-SAL-001`).

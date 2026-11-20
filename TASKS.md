@@ -256,6 +256,23 @@ Notes:
 - **Tests:** Local Supabase migration reset, database RLS tests, unit tests, integration tests, lint, typecheck, and production build passed.
 - **Notes:** TASK-PRO-001 completed via migration `20260730120000_create_product_schema_and_rls.sql`.
 
+### TASK-PRO-002
+
+- **Title:** Implement product and category catalog UI and actions
+- **Status:** DONE
+- **Priority:** P1
+- **Depends on:** TASK-PRO-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `/dashboard/products` lists products for the active organization with search (name/SKU), status, product type, category filter, and pagination
+  - Owners, Admins, Staff, Viewers, and Technicians can read products; only Owners, Admins, and Staff can create/edit products and manage categories; only Owners and Admins can archive products (`archive_product` RPC) and view/edit `cost_price`
+  - Service items automatically enforce `track_inventory = false` and `minimum_stock = null`
+  - Category dialog supports listing, creating, and deleting unused categories with inline confirmation and safe FK error mapping
+  - Archive action requires confirmation dialog and calls `archive_product` RPC cleanly
+  - Products link added to dashboard navigation
+- **Tests:** Unit tests, integration tests, database RLS tests, Playwright E2E (`tests/e2e/products.spec.ts`), lint, typecheck, and production build passed.
+- **Notes:** Implements vertical slice for `src/features/products/` and `/dashboard/products`.
+
 ### TASK-INV-001
 
 - **Title:** Create warehouse and inventory ledger schema
