@@ -49,6 +49,7 @@ The format follows these sections:
 - Product and category management page at `/dashboard/products` with search, status/type/category filters, pagination, create/edit/archive product workflows, category management dialog, role-scoped `cost_price` visibility, and dashboard navigation link (`TASK-PRO-002`).
 - Warehouse, inventory balance, and append-only inventory transaction ledger schema and RLS (`TASK-INV-001`).
 - Atomic `perform_stock_adjustment` RPC and `adjustStockAction` server action with idempotency, permission checks, and safe error mapping (`TASK-INV-002`).
+- Warehouse and inventory management page at `/dashboard/inventory` with warehouse CRUD/activation dialog, stock adjustment modal (with idempotency keys and insufficient-stock handling), low-stock badges/filters, append-only movement ledger, and dashboard navigation link (`TASK-INV-003`).
 - Sales orders, sales order items, and payments schema and RLS with fixed-precision numeric totals (`TASK-SAL-001`).
 
 ### Changed

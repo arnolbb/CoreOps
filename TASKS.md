@@ -304,6 +304,22 @@ Notes:
 - **Tests:** Local Supabase migration reset, database SQL RPC tests, unit tests, integration tests, lint, typecheck, and production build passed.
 - **Notes:** TASK-INV-002 completed via migrations `20260801120000_create_stock_adjustment_rpc.sql` and `20260803120000_fix_stock_adjustment_rpc.sql` (fixes PL/pgSQL column ambiguity, blank idempotency keys, and inactive warehouse check), plus explicit permission checks and safe error mapping in `adjustStockAction`.
 
+### TASK-INV-003
+
+- **Title:** Implement warehouse management, stock balances, and inventory ledger UI
+- **Status:** DONE
+- **Priority:** P1
+- **Depends on:** TASK-INV-002, TASK-PRO-002
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `/dashboard/inventory` displays summary metrics, warehouse/search/low-stock filters, paginated stock balances, and the append-only recent inventory ledger
+  - Warehouse management dialog supports creating, editing, deactivating (with inline confirmation), and reactivating warehouses via server-validated Server Actions
+  - Stock adjustment dialog supports `opening_stock`, `adjustment_in`, and `adjustment_out` with generated idempotency keys, required reasons for manual adjustments, and safe RPC error surfacing
+  - Owners, Admins, Staff, Viewers, and Technicians can read inventory; only Owners, Admins, and Staff can manage warehouses and adjust stock
+  - Inventory link added to dashboard navigation
+- **Tests:** Unit tests, integration tests, database SQL tests, Playwright E2E (`tests/e2e/inventory.spec.ts`), lint, typecheck, and production build passed.
+- **Notes:** Implements vertical slice for `src/features/inventory/` and `/dashboard/inventory`.
+
 ---
 
 ## EPIC SALES
