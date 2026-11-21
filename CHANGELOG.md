@@ -51,12 +51,17 @@ The format follows these sections:
 - Atomic `perform_stock_adjustment` RPC and `adjustStockAction` server action with idempotency, permission checks, and safe error mapping (`TASK-INV-002`).
 - Warehouse and inventory management page at `/dashboard/inventory` with warehouse CRUD/activation dialog, stock adjustment modal (with idempotency keys and insufficient-stock handling), low-stock badges/filters, append-only movement ledger, and dashboard navigation link (`TASK-INV-003`).
 - Sales orders, sales order items, and payments schema and RLS with fixed-precision numeric totals (`TASK-SAL-001`).
+- Transactional sales order and payment lifecycle RPCs (`20260804120000_create_sales_rpcs.sql`) with server-side fixed-precision calculations, atomic stock deduction on confirmation (`sale_out`), payment recording/voiding without deletion, cancellation stock restoration (`return_in`), `/dashboard/sales` & `/dashboard/sales/[id]` UI, printable invoice view, and dashboard navigation link (`TASK-SAL-002`).
+- Work orders schema, RLS, private `work-order-attachments` storage policies, extended inventory transaction types (`work_order_out`, `work_order_return`), atomic lifecycle/item-usage RPCs (`20260805120000_create_work_orders_schema_and_rls.sql`), `/dashboard/work-orders` & `/dashboard/work-orders/[id]` UI, and dashboard navigation link (`TASK-WOR-001`, `TASK-WOR-002`).
+- Operational `/dashboard` with role-scoped KPIs (customers, organization-timezone monthly sales, outstanding balances, low-stock items, active work orders), onboarding checklist for empty organizations, scoped `get_recent_organization_audit_logs` RPC (`20260806120000_create_dashboard_audit_read_rpc.sql`), and responsive primary navigation header (`TASK-DSH-001`).
 
 ### Changed
 
 - CI now runs deterministic database tests after local Supabase resets.
 - CI now enforces unit tests, integration tests, production build, and the live authentication and organization onboarding Playwright flows.
-- `scripts/run-db-tests.mjs` now executes all 7 database RLS and RPC test suites (`organization_memberships_rls`, `member_invitations`, `customers_rls`, `products_rls`, `inventory_rls`, `stock_adjustment_rpc`, `sales_rls`), and CI verifies all migrations through `20260803120000`.
+- `scripts/run-db-tests.mjs` now executes all 10 database RLS and RPC test suites (`organization_memberships_rls`, `member_invitations`, `customers_rls`, `products_rls`, `inventory_rls`, `stock_adjustment_rpc`, `sales_rls`, `sales_rpcs`, `work_orders_rls`, `dashboard_audit_rpc`), and CI verifies all 12 migrations through `20260806120000`.
+- `src/app/(dashboard)/layout.tsx` uses Next.js `<Link>` navigation across Dashboard, Customers, Products, Inventory, Sales, Work Orders, and Team, and hides the header during invoice printing (`print:hidden`).
+- `InventoryLedgerList` displays labels for `work_order_out` and `work_order_return` movements.
 
 ### Fixed
 

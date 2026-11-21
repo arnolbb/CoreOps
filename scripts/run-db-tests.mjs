@@ -10,6 +10,9 @@ const tests = [
   "inventory_rls.sql",
   "stock_adjustment_rpc.sql",
   "sales_rls.sql",
+  "sales_rpcs.sql",
+  "work_orders_rls.sql",
+  "dashboard_audit_rpc.sql",
 ];
 
 function run(command, args, options = {}) {

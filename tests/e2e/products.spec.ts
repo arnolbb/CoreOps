@@ -147,7 +147,7 @@ test("products page supports categories, create, search, edit, and archive", asy
   await createOrganization(page, "Products Test Org", slug);
   await expect(page).toHaveURL(/\/dashboard$/);
 
-  await page.getByRole("link", { name: "Products" }).click();
+  await page.getByRole("link", { name: "Products", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard\/products$/);
   await expect(
     page.getByRole("heading", { name: "Products", exact: true }),

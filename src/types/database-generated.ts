@@ -752,6 +752,7 @@ export type Database = {
       };
       sales_orders: {
         Row: {
+          cancellation_reason: string | null;
           cancelled_at: string | null;
           completed_at: string | null;
           confirmed_at: string | null;
@@ -771,8 +772,10 @@ export type Database = {
           subtotal: number;
           tax_total: number;
           updated_at: string;
+          warehouse_id: string | null;
         };
         Insert: {
+          cancellation_reason?: string | null;
           cancelled_at?: string | null;
           completed_at?: string | null;
           confirmed_at?: string | null;
@@ -792,8 +795,10 @@ export type Database = {
           subtotal?: number;
           tax_total?: number;
           updated_at?: string;
+          warehouse_id?: string | null;
         };
         Update: {
+          cancellation_reason?: string | null;
           cancelled_at?: string | null;
           completed_at?: string | null;
           confirmed_at?: string | null;
@@ -813,6 +818,7 @@ export type Database = {
           subtotal?: number;
           tax_total?: number;
           updated_at?: string;
+          warehouse_id?: string | null;
         };
         Relationships: [
           {
@@ -828,6 +834,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "organizations";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sales_orders_warehouse_org_fkey";
+            columns: ["organization_id", "warehouse_id"];
+            isOneToOne: false;
+            referencedRelation: "warehouses";
+            referencedColumns: ["organization_id", "id"];
           },
         ];
       };
@@ -907,6 +920,236 @@ export type Database = {
           },
         ];
       };
+      work_order_attachments: {
+        Row: {
+          attachment_type: string;
+          created_at: string;
+          file_name: string;
+          id: string;
+          mime_type: string;
+          organization_id: string;
+          size_bytes: number;
+          storage_path: string;
+          uploaded_by: string;
+          work_order_id: string;
+        };
+        Insert: {
+          attachment_type: string;
+          created_at?: string;
+          file_name: string;
+          id?: string;
+          mime_type: string;
+          organization_id: string;
+          size_bytes: number;
+          storage_path: string;
+          uploaded_by: string;
+          work_order_id: string;
+        };
+        Update: {
+          attachment_type?: string;
+          created_at?: string;
+          file_name?: string;
+          id?: string;
+          mime_type?: string;
+          organization_id?: string;
+          size_bytes?: number;
+          storage_path?: string;
+          uploaded_by?: string;
+          work_order_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "work_order_attachments_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "work_order_attachments_work_order_org_fkey";
+            columns: ["organization_id", "work_order_id"];
+            isOneToOne: false;
+            referencedRelation: "work_orders";
+            referencedColumns: ["organization_id", "id"];
+          },
+        ];
+      };
+      work_order_items: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          id: string;
+          inventory_transaction_id: string | null;
+          name_snapshot: string;
+          organization_id: string;
+          product_id: string;
+          quantity: number;
+          unit_snapshot: string;
+          warehouse_id: string;
+          work_order_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          inventory_transaction_id?: string | null;
+          name_snapshot: string;
+          organization_id: string;
+          product_id: string;
+          quantity: number;
+          unit_snapshot: string;
+          warehouse_id: string;
+          work_order_id: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          inventory_transaction_id?: string | null;
+          name_snapshot?: string;
+          organization_id?: string;
+          product_id?: string;
+          quantity?: number;
+          unit_snapshot?: string;
+          warehouse_id?: string;
+          work_order_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "work_order_items_inventory_transaction_id_fkey";
+            columns: ["inventory_transaction_id"];
+            isOneToOne: false;
+            referencedRelation: "inventory_transactions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "work_order_items_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "work_order_items_product_org_fkey";
+            columns: ["organization_id", "product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["organization_id", "id"];
+          },
+          {
+            foreignKeyName: "work_order_items_warehouse_org_fkey";
+            columns: ["organization_id", "warehouse_id"];
+            isOneToOne: false;
+            referencedRelation: "warehouses";
+            referencedColumns: ["organization_id", "id"];
+          },
+          {
+            foreignKeyName: "work_order_items_work_order_org_fkey";
+            columns: ["organization_id", "work_order_id"];
+            isOneToOne: false;
+            referencedRelation: "work_orders";
+            referencedColumns: ["organization_id", "id"];
+          },
+        ];
+      };
+      work_orders: {
+        Row: {
+          assigned_to: string | null;
+          cancellation_reason: string | null;
+          cancelled_at: string | null;
+          completed_at: string | null;
+          completion_notes: string | null;
+          created_at: string;
+          created_by: string;
+          customer_address_id: string | null;
+          customer_id: string;
+          description: string;
+          id: string;
+          organization_id: string;
+          priority: string;
+          scheduled_end: string | null;
+          scheduled_start: string | null;
+          started_at: string | null;
+          status: string;
+          updated_at: string;
+          work_order_number: string;
+          work_type: string;
+        };
+        Insert: {
+          assigned_to?: string | null;
+          cancellation_reason?: string | null;
+          cancelled_at?: string | null;
+          completed_at?: string | null;
+          completion_notes?: string | null;
+          created_at?: string;
+          created_by: string;
+          customer_address_id?: string | null;
+          customer_id: string;
+          description: string;
+          id?: string;
+          organization_id: string;
+          priority?: string;
+          scheduled_end?: string | null;
+          scheduled_start?: string | null;
+          started_at?: string | null;
+          status?: string;
+          updated_at?: string;
+          work_order_number: string;
+          work_type: string;
+        };
+        Update: {
+          assigned_to?: string | null;
+          cancellation_reason?: string | null;
+          cancelled_at?: string | null;
+          completed_at?: string | null;
+          completion_notes?: string | null;
+          created_at?: string;
+          created_by?: string;
+          customer_address_id?: string | null;
+          customer_id?: string;
+          description?: string;
+          id?: string;
+          organization_id?: string;
+          priority?: string;
+          scheduled_end?: string | null;
+          scheduled_start?: string | null;
+          started_at?: string | null;
+          status?: string;
+          updated_at?: string;
+          work_order_number?: string;
+          work_type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "work_orders_assigned_to_org_fkey";
+            columns: ["organization_id", "assigned_to"];
+            isOneToOne: false;
+            referencedRelation: "organization_memberships";
+            referencedColumns: ["organization_id", "user_id"];
+          },
+          {
+            foreignKeyName: "work_orders_customer_address_org_fkey";
+            columns: ["organization_id", "customer_id", "customer_address_id"];
+            isOneToOne: false;
+            referencedRelation: "customer_addresses";
+            referencedColumns: ["organization_id", "customer_id", "id"];
+          },
+          {
+            foreignKeyName: "work_orders_customer_org_fkey";
+            columns: ["organization_id", "customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["organization_id", "id"];
+          },
+          {
+            foreignKeyName: "work_orders_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -915,29 +1158,51 @@ export type Database = {
       accept_organization_invitation: {
         Args: { invitation_token_hash: string };
         Returns: {
+          status: string;
           membership_id: string;
           organization_id: string;
           role: string;
-          status: string;
           reactivated: boolean;
         }[];
+      };
+      apply_sales_order_inventory_movement: {
+        Args: {
+          p_actor_user_id: string;
+          p_idempotency_key: string;
+          p_organization_id: string;
+          p_product_id: string;
+          p_quantity_delta: number;
+          p_reason: string;
+          p_reference_id: string;
+          p_transaction_type: string;
+          p_warehouse_id: string;
+        };
+        Returns: undefined;
       };
       archive_customer: {
         Args: { target_customer_id: string };
         Returns: {
-          status: string;
           customer_id: string;
-          organization_id: string;
           archived_at: string;
+          status: string;
+          organization_id: string;
         }[];
       };
       archive_product: {
         Args: { target_product_id: string };
         Returns: {
-          is_active: boolean;
-          archived_at: string;
           product_id: string;
+          is_active: boolean;
           organization_id: string;
+          archived_at: string;
+        }[];
+      };
+      cancel_sales_order: {
+        Args: { p_reason: string; p_sales_order_id: string };
+        Returns: {
+          cancelled_at: string;
+          status: string;
+          sales_order_id: string;
         }[];
       };
       citext: {
@@ -963,6 +1228,23 @@ export type Database = {
       citextsend: {
         Args: { "": string };
         Returns: string;
+      };
+      complete_sales_order: {
+        Args: { p_sales_order_id: string };
+        Returns: {
+          status: string;
+          sales_order_id: string;
+          completed_at: string;
+        }[];
+      };
+      confirm_sales_order: {
+        Args: { p_sales_order_id: string; p_warehouse_id?: string };
+        Returns: {
+          status: string;
+          warehouse_id: string;
+          confirmed_at: string;
+          sales_order_id: string;
+        }[];
       };
       create_organization: {
         Args: {
@@ -995,14 +1277,62 @@ export type Database = {
           target_organization_id: string;
         };
         Returns: {
-          invitation_id: string;
-          organization_id: string;
           email: string;
-          role: string;
-          status: string;
-          expires_at: string;
+          organization_id: string;
+          invitation_id: string;
           was_resent: boolean;
+          expires_at: string;
+          status: string;
+          role: string;
         }[];
+      };
+      create_sales_order_draft: {
+        Args: {
+          p_customer_id: string;
+          p_items: Json;
+          p_notes?: string;
+          p_order_number?: string;
+          p_warehouse_id?: string;
+        };
+        Returns: {
+          discount_total: number;
+          grand_total: number;
+          tax_total: number;
+          paid_total: number;
+          sales_order_id: string;
+          order_number: string;
+          status: string;
+          payment_status: string;
+          currency_code: string;
+          subtotal: number;
+        }[];
+      };
+      create_work_order: {
+        Args: {
+          p_assigned_to?: string;
+          p_customer_address_id?: string;
+          p_customer_id: string;
+          p_description: string;
+          p_organization_id: string;
+          p_priority?: string;
+          p_scheduled_end?: string;
+          p_scheduled_start?: string;
+          p_status?: string;
+          p_work_type: string;
+        };
+        Returns: {
+          work_order_id: string;
+          organization_id: string;
+          work_order_number: string;
+          status: string;
+          assigned_to: string;
+          created_at: string;
+          customer_id: string;
+        }[];
+      };
+      current_user_can_admin_sales: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
       };
       current_user_can_archive_customers: {
         Args: { checked_organization_id: string };
@@ -1036,6 +1366,10 @@ export type Database = {
         Args: { checked_organization_id: string };
         Returns: boolean;
       };
+      current_user_can_manage_work_orders: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
       current_user_can_read_customers: {
         Args: { checked_organization_id: string };
         Returns: boolean;
@@ -1052,12 +1386,38 @@ export type Database = {
         Args: { checked_organization_id: string };
         Returns: boolean;
       };
+      current_user_can_read_work_order: {
+        Args: {
+          checked_organization_id: string;
+          checked_work_order_id: string;
+        };
+        Returns: boolean;
+      };
+      current_user_can_read_work_orders: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
+      current_user_can_reopen_work_orders: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
       current_user_can_update_customers: {
         Args: { checked_organization_id: string };
         Returns: boolean;
       };
+      current_user_can_upload_work_order_attachment: {
+        Args: {
+          checked_organization_id: string;
+          checked_work_order_id: string;
+        };
+        Returns: boolean;
+      };
       current_user_has_active_membership: {
         Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
+      current_user_has_assigned_work_order_for_customer: {
+        Args: { checked_customer_id: string; checked_organization_id: string };
         Returns: boolean;
       };
       current_user_has_organization_role: {
@@ -1068,9 +1428,25 @@ export type Database = {
         Args: { checked_organization_id: string };
         Returns: boolean;
       };
+      current_user_is_work_order_technician: {
+        Args: { checked_organization_id: string };
+        Returns: boolean;
+      };
       customer_is_active_in_organization: {
         Args: { checked_customer_id: string; checked_organization_id: string };
         Returns: boolean;
+      };
+      derive_sales_payment_status: {
+        Args: { p_grand_total: number; p_paid_total: number };
+        Returns: string;
+      };
+      generate_sales_order_number: {
+        Args: { target_organization_id: string };
+        Returns: string;
+      };
+      generate_work_order_number: {
+        Args: { p_organization_id: string };
+        Returns: string;
       };
       get_organization_invitation_preview: {
         Args: { invitation_token_hash: string };
@@ -1093,6 +1469,25 @@ export type Database = {
           joined_at: string;
         }[];
       };
+      get_recent_organization_audit_logs: {
+        Args: { p_limit?: number; target_organization_id: string };
+        Returns: {
+          id: string;
+          action: string;
+          entity_type: string;
+          entity_id: string;
+          actor_email: string;
+          created_at: string;
+        }[];
+      };
+      get_work_order_assignees: {
+        Args: { target_organization_id: string };
+        Returns: {
+          role: string;
+          user_id: string;
+          email: string;
+        }[];
+      };
       perform_stock_adjustment: {
         Args: {
           p_adjustment_type: string;
@@ -1103,16 +1498,20 @@ export type Database = {
           p_warehouse_id: string;
         };
         Returns: {
-          transaction_type: string;
           quantity_delta: number;
-          transaction_id: string;
-          organization_id: string;
-          warehouse_id: string;
           product_id: string;
+          warehouse_id: string;
+          organization_id: string;
+          transaction_id: string;
           quantity_after: number;
-          created_at: string;
           quantity_before: number;
+          transaction_type: string;
+          created_at: string;
         }[];
+      };
+      prepare_sales_order_items: {
+        Args: { raw_items: Json; target_organization_id: string };
+        Returns: Json;
       };
       record_organization_audit_event: {
         Args: {
@@ -1127,14 +1526,131 @@ export type Database = {
         };
         Returns: undefined;
       };
+      record_sales_payment: {
+        Args: {
+          p_amount: number;
+          p_notes?: string;
+          p_paid_at?: string;
+          p_payment_method: string;
+          p_reference?: string;
+          p_sales_order_id: string;
+        };
+        Returns: {
+          payment_id: string;
+          sales_order_id: string;
+          paid_total: number;
+          amount: number;
+          payment_status: string;
+        }[];
+      };
+      record_work_order_item_usage: {
+        Args: {
+          p_idempotency_key?: string;
+          p_product_id: string;
+          p_quantity: number;
+          p_warehouse_id: string;
+          p_work_order_id: string;
+        };
+        Returns: {
+          work_order_item_id: string;
+          inventory_transaction_id: string;
+          organization_id: string;
+          work_order_id: string;
+          warehouse_id: string;
+          product_id: string;
+          quantity: number;
+          quantity_before: number;
+          quantity_after: number;
+          created_at: string;
+        }[];
+      };
+      reopen_work_order: {
+        Args: { p_reason: string; p_work_order_id: string };
+        Returns: {
+          work_order_id: string;
+          organization_id: string;
+          work_order_number: string;
+          status: string;
+          updated_at: string;
+        }[];
+      };
       revoke_organization_invitation: {
         Args: { invitation_id: string };
         Returns: {
-          revoked_invitation_id: string;
-          organization_id: string;
-          email: string;
-          role: string;
           status: string;
+          revoked_invitation_id: string;
+          role: string;
+          email: string;
+          organization_id: string;
+        }[];
+      };
+      transition_work_order_status: {
+        Args: {
+          p_cancellation_reason?: string;
+          p_completion_notes?: string;
+          p_target_status: string;
+          p_work_order_id: string;
+        };
+        Returns: {
+          cancelled_at: string;
+          work_order_id: string;
+          organization_id: string;
+          work_order_number: string;
+          status: string;
+          started_at: string;
+          completed_at: string;
+        }[];
+      };
+      update_sales_order_draft: {
+        Args: {
+          p_customer_id: string;
+          p_items: Json;
+          p_notes?: string;
+          p_sales_order_id: string;
+          p_warehouse_id?: string;
+        };
+        Returns: {
+          sales_order_id: string;
+          order_number: string;
+          status: string;
+          payment_status: string;
+          currency_code: string;
+          subtotal: number;
+          discount_total: number;
+          tax_total: number;
+          grand_total: number;
+          paid_total: number;
+        }[];
+      };
+      update_work_order: {
+        Args: {
+          p_assigned_to?: string;
+          p_customer_address_id?: string;
+          p_customer_id: string;
+          p_description: string;
+          p_priority: string;
+          p_scheduled_end?: string;
+          p_scheduled_start?: string;
+          p_work_order_id: string;
+          p_work_type: string;
+        };
+        Returns: {
+          work_order_id: string;
+          organization_id: string;
+          work_order_number: string;
+          customer_id: string;
+          status: string;
+          assigned_to: string;
+          updated_at: string;
+        }[];
+      };
+      void_sales_payment: {
+        Args: { p_payment_id: string; p_void_reason: string };
+        Returns: {
+          payment_status: string;
+          payment_id: string;
+          sales_order_id: string;
+          paid_total: number;
         }[];
       };
     };

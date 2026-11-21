@@ -8,6 +8,8 @@ const transactionLabels: Record<string, string> = {
   return_in: "Return In",
   transfer_in: "Transfer In",
   transfer_out: "Transfer Out",
+  work_order_out: "Work Order Out",
+  work_order_return: "Work Order Return",
 };
 
 function formatDateTime(value: string) {

@@ -147,7 +147,7 @@ test("inventory page supports warehouse creation, opening stock, adjustments, in
   await createOrganization(page, "Inventory Test Org", slug);
   await expect(page).toHaveURL(/\/dashboard$/);
 
-  await page.getByRole("link", { name: "Products" }).click();
+  await page.getByRole("link", { name: "Products", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard\/products$/);
 
   await page.getByRole("button", { name: "Add Product" }).click();
@@ -162,7 +162,7 @@ test("inventory page supports warehouse creation, opening stock, adjustments, in
   await productDialog.getByRole("button", { name: "Create Product" }).click();
   await expect(productDialog).toBeHidden();
 
-  await page.getByRole("link", { name: "Inventory" }).click();
+  await page.getByRole("link", { name: "Inventory", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard\/inventory$/);
   await expect(
     page.getByRole("heading", { name: "Inventory", exact: true }),

@@ -342,9 +342,17 @@ Notes:
 ### TASK-SAL-002
 
 - **Title:** Implement transactional sales order creation
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-SAL-001, TASK-INV-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - Server-side `SECURITY DEFINER` RPCs (`create_sales_order_draft`, `update_sales_order_draft`, `confirm_sales_order`, `record_sales_payment`, `void_sales_payment`, `complete_sales_order`, `cancel_sales_order`) compute `numeric(18,2)`/`numeric(18,3)` totals and snapshots server-side without trusting client totals.
+  - Order confirmation atomically validates and deducts tracked inventory (`sale_out` ledger transactions with idempotency keys); cancellation (Owner/Admin only, after blocking active payments) restores stock via `return_in`.
+  - Posting payments recalculates `paid_total` and `payment_status` without permitting overpayments; posted payments cannot be deleted and must use audited `void_sales_payment` (Owner/Admin only).
+  - `/dashboard/sales` and `/dashboard/sales/[id]` provide filters, pagination, draft creation/editing, lifecycle confirmations, payment management, and a printable invoice view (`print:` stylesheet).
+- **Tests:** Database SQL RPC tests (`supabase/tests/sales_rpcs.sql`), Vitest unit & integration tests, Playwright E2E (`tests/e2e/sales.spec.ts`), lint, typecheck, and production build passed.
+- **Notes:** Migration `20260804120000_create_sales_rpcs.sql` plus `src/features/sales/` vertical slice.
 
 ---
 
@@ -353,16 +361,50 @@ Notes:
 ### TASK-WOR-001
 
 - **Title:** Create work order schema
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-CUS-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `work_orders`, `work_order_items`, and `work_order_attachments` tables created with UUID primary keys, composite org foreign keys (`customers`, `customer_addresses`, `organization_memberships`, `products`, `warehouses`), and append-only triggers on `work_order_items`.
+  - RLS restricts Technicians to assigned work orders and assigned customers while allowing Owner/Admin/Staff management and Viewer read access.
+  - Private `work-order-attachments` storage bucket and `storage.objects` policies enforce tenant and work-order authorization.
+  - Inventory transaction ledger supports `work_order_out` and `work_order_return` alongside atomic lifecycle & item consumption RPCs.
+- **Tests:** Local Supabase double reset and SQL test suite (`supabase/tests/work_orders_rls.sql`) passed.
+- **Notes:** Completed via migration `20260805120000_create_work_orders_schema_and_rls.sql`.
 
 ### TASK-WOR-002
 
 - **Title:** Implement work order lifecycle
-- **Status:** BACKLOG
+- **Status:** DONE
 - **Priority:** P1
 - **Depends on:** TASK-WOR-001
+- **Specification:** `docs/02-product-requirements.md`, `docs/04-business-workflows.md`, `docs/05-system-architecture.md`, `docs/06-database-design.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `/dashboard/work-orders` and `/dashboard/work-orders/[id]` support responsive mobile cards, desktop table, search/status/priority/assignee filters, and pagination.
+  - Create/edit work order modal supports customer, cascading customer address, work type, priority, schedule window, and team assignee selection.
+  - State machine transitions (`draft`, `scheduled`, `in_progress`, `completed`, `cancelled`) enforce role permissions, require completion notes on finish and reasons on cancellation, lock completed records, and restrict audited reopen (`in_progress`) to Owner/Admin.
+  - Used stock items record idempotent inventory deductions (`work_order_out`) atomically; private attachments validate MIME/size server-side and use short-lived signed URLs.
+- **Tests:** Unit tests, integration tests, SQL RLS/RPC tests, Playwright E2E (`tests/e2e/work-orders.spec.ts`), lint, typecheck, and production build passed.
+- **Notes:** Implements vertical slice under `src/features/work-orders/` and `/dashboard/work-orders`.
+
+---
+
+## EPIC DASHBOARD AND REPORTING
+
+### TASK-DSH-001
+
+- **Title:** Implement operational dashboard
+- **Status:** DONE
+- **Priority:** P1
+- **Depends on:** TASK-CUS-002, TASK-INV-003, TASK-SAL-002, TASK-WOR-002
+- **Specification:** `docs/02-product-requirements.md`, `docs/05-system-architecture.md`, `docs/07-authorization-and-permissions.md`, `docs/09-ui-ux-guidelines.md`, `docs/10-security.md`, `docs/12-testing-strategy.md`
+- **Acceptance criteria:**
+  - `/dashboard` displays organization-scoped KPIs (Total customers, Sales this month respecting organization IANA timezone boundaries, Outstanding payments, Low-stock products, Active work orders) plus Low-Stock Alerts, Active Work Orders, and Recent Activity panels.
+  - Financial totals and `get_recent_organization_audit_logs` feed are restricted to Owner and Admin; non-admin operational roles see scoped operational counts/activities only.
+  - Empty organizations show onboarding guidance checklist while keeping compatibility with post-onboarding checks.
+- **Tests:** Database SQL RPC tests (`supabase/tests/dashboard_audit_rpc.sql`), unit tests (timezone boundaries & permissions), integration tests, Playwright E2E (`tests/e2e/dashboard.spec.ts` and `tests/e2e/organization-onboarding.spec.ts`), lint, typecheck, and production build passed.
+- **Notes:** Migration `20260806120000_create_dashboard_audit_read_rpc.sql` plus `src/features/dashboard/` vertical slice and updated primary dashboard navigation.
 
 ---
 
